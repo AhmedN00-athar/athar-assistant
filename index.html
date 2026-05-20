@@ -567,7 +567,10 @@ button {
         <p class="text-muted mb-8">يستخرج: هوك + فصول حقيقية من المحتوى + تقرير جودة</p>
         <div class="file-info" id="file-info"></div>
         <textarea id="script-text" placeholder="الصق نص الحلقة كاملاً هنا..."></textarea>
-        <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="smartAnalyzeScript()">🧠 تحليل ذكي عميق</button>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <button class="btn-secondary" style="flex: 1;" onclick="smartAnalyzeScript()">🧠 تحليل ذكي عميق</button>
+          <button class="btn-claude" style="flex: 1;" onclick="prepareEnhanceScriptMessage()">✨ حسّن النص بنمط أثر + المراجع</button>
+        </div>
       </div>
 
       <div id="quality-report"></div>
@@ -609,6 +612,11 @@ button {
 
       <!-- CHAPTERS -->
       <h3 style="margin-top: 14px;">⏰ الفصول الزمنية</h3>
+      <div class="row" style="grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin-bottom: 8px;">
+        <label style="margin: 0; white-space: nowrap;">المدة الفعلية للحلقة:</label>
+        <input type="text" id="real-duration" placeholder="مثلاً 9:30" style="max-width: 120px;" oninput="onRealDurationChange()">
+      </div>
+      <p class="text-muted mb-8">اكتب المدة الحقيقية (دقيقة:ثانية) لتوزيع الفصول بدقة. لو فاضية، يُحسب تلقائياً من النص.</p>
       <div style="display: flex; gap: 6px; margin-bottom: 8px;">
         <button class="btn-secondary btn-small" onclick="addChapter()">➕ فصل</button>
         <button class="btn-secondary btn-small" onclick="redistributeChapters()">🔀 توزيع تلقائي</button>
@@ -1159,14 +1167,44 @@ function moveChapter(i, dir) {
   chapters.forEach(c => c.time = secondsToTime(c.seconds));
   renderChapters();
 }
+function getEffectiveDuration() {
+  // أولوية للمدة الفعلية المكتوبة يدوياً
+  const rd = val('real-duration');
+  if (rd && rd.includes(':')) {
+    const sec = timeToSeconds(rd);
+    if (sec > 0) return sec;
+  } else if (rd && !isNaN(parseInt(rd))) {
+    // لو كتب رقم بس (دقائق)
+    return parseInt(rd) * 60;
+  }
+  // وإلا المدة المحسوبة من النص
+  if (lastScriptDuration > 0) return lastScriptDuration;
+  // وإلا آخر فصل + هامش
+  return chapters.length > 0 ? (chapters[chapters.length-1].seconds + 90) : 600;
+}
+
+function onRealDurationChange() {
+  // تحديث الملخص فقط عند تغيير المدة
+  if (chapters.length > 0) {
+    const tot = getEffectiveDuration();
+    getEl('chapters-summary').innerHTML = `${chapters.length} فصل · المدة ${secondsToTime(tot)} · اضغط "توزيع تلقائي" لإعادة الترتيب`;
+  }
+}
+
 function redistributeChapters() {
-  if (chapters.length === 0) return;
-  const total = lastScriptDuration > 0 ? lastScriptDuration : (chapters[chapters.length-1]?.seconds || 720);
+  if (chapters.length === 0) { alert('لا توجد فصول لتوزيعها. أضف فصولاً أو حلّل النص أولاً.'); return; }
+  const total = getEffectiveDuration();
+  const n = chapters.length;
+  // توزيع: الفصل الأول من 0، والباقي موزّع بانتظام حتى ~92% من المدة (نترك خاتمة)
   chapters.forEach((c, i) => {
-    const sec = Math.floor((i / chapters.length) * total);
-    c.seconds = sec; c.time = secondsToTime(sec);
+    let sec;
+    if (i === 0) sec = 0;
+    else sec = Math.round((i / n) * total);
+    c.seconds = sec;
+    c.time = secondsToTime(sec);
   });
   renderChapters();
+  showSaved();
 }
 function renderChapters() {
   const el = getEl('chapters-list');
@@ -1183,8 +1221,8 @@ function renderChapters() {
       <button class="btn-danger btn-small" onclick="removeChapter(${i})">✕</button>
     </div>
   `).join('');
-  const tot = chapters[chapters.length-1]?.seconds || 0;
-  getEl('chapters-summary').innerHTML = `${chapters.length} فصل · ${Math.floor(tot/60)} دقيقة`;
+  const tot = getEffectiveDuration();
+  getEl('chapters-summary').innerHTML = `${chapters.length} فصل · المدة ${secondsToTime(tot)}`;
 }
 
 // ===== SMART ANALYZER =====
@@ -1203,18 +1241,34 @@ function smartAnalyzeScript() {
   const text = val('script-text');
   if (!text) { alert('الصق نص الحلقة أولاً'); return; }
   const wc = text.split(/\s+/).filter(w => w.length > 1).length;
-  const dur = wc / 150;
-  lastScriptDuration = Math.floor(dur * 60);
+
+  // المدة: أولوية للمدة الفعلية المكتوبة، وإلا حساب تلقائي بسرعة أثر (~105 كلمة/دقيقة - راوي درامي بطيء مع وقفات)
+  const realDur = val('real-duration');
+  let durSec;
+  let durSource;
+  if (realDur && (realDur.includes(':') || !isNaN(parseInt(realDur)))) {
+    durSec = realDur.includes(':') ? timeToSeconds(realDur) : parseInt(realDur) * 60;
+    durSource = 'يدوي';
+  } else {
+    durSec = Math.round((wc / 105) * 60); // سرعة أثر الدرامية البطيئة
+    durSource = 'تقديري';
+  }
+  const dur = durSec / 60;
+  lastScriptDuration = durSec;
+
   const qr = analyzeQuality(text, wc);
   renderQualityReport(qr);
+
+  // عدد الفصول حسب المدة الفعلية
   let tc;
-  if (dur < 5) tc = 3; else if (dur < 8) tc = 4; else if (dur < 12) tc = 6; else if (dur < 18) tc = 8; else tc = 10;
+  if (dur < 4) tc = 3; else if (dur < 7) tc = 4; else if (dur < 11) tc = 5; else if (dur < 16) tc = 7; else tc = 9;
+
   const hookR = extractHook(text);
   if (hookR.hook && !val('hook-line')) setVal('hook-line', hookR.hook);
   chapters = extractChapters(text, tc, dur);
   renderChapters();
   const fi = getEl('file-info'); fi.style.display = 'block';
-  fi.innerHTML = `✓ تحليل اكتمل: ${wc} كلمة · ${Math.round(dur)} دقيقة · ${chapters.length} فصل ${hookR.hook ? '· هوك (' + hookR.method + ')' : '· لم يُكتشف هوك تلقائي'}`;
+  fi.innerHTML = `✓ تحليل اكتمل: ${wc} كلمة · المدة ${secondsToTime(durSec)} (${durSource}) · ${chapters.length} فصل ${hookR.hook ? '· هوك (' + hookR.method + ')' : '· لم يُكتشف هوك تلقائي'}`;
 }
 
 function extractHook(text) {
@@ -1638,6 +1692,28 @@ function copyClaudeMessage() {
   navigator.clipboard.writeText(t).then(() => showSaved());
 }
 
+function prepareEnhanceScriptMessage() {
+  const story = val('story-name');
+  const type = val('topic-type');
+  const script = val('script-text');
+  if (!script || script.length < 50) { alert('الصق نص الحلقة أولاً (50 حرف على الأقل)'); return; }
+
+  let msg = `طبّق سكِل islamic-stories-producer وحسّن نص حلقة قناة "أثر" التالي.\n\n`;
+  if (story) msg += `📌 القصة: ${story}\n`;
+  if (type) msg += `📌 النوع: ${TYPE_NAMES[type] || 'عام'}\n`;
+  msg += `\n📄 النص الخام الحالي:\n"""\n${script.substring(0, 5000)}${script.length > 5000 ? '\n...(مقتطف)' : ''}\n"""\n\n`;
+
+  msg += `🎯 المطلوب: أعد صياغة النص بالكامل بحيث:\n\n`;
+  msg += `1. **أسلوب الهكواتي السينمائي لأثر**: عامية مصرية حميمة، جُمل قصيرة (2-4 كلمات للسطر)، بناء تشويق قبل كشف الأسماء، همسات عند الذروة، افتتاحيات بـ "تخيّل...".\n`;
+  msg += `2. **التوثيق بالمراجع الصحيحة**: تحقّق من كل آية/حديث/حوار قبل كتابته — الآيات من القرآن بالرسم العثماني ﴿ ﴾، الأحاديث من البخاري ومسلم وأبي داود والترمذي مع ذكر المصدر والدرجة، والقصص من ابن كثير والطبري والقرطبي. لا تكتب أي نص ديني من الذاكرة.\n`;
+  msg += `3. **العربية الفصحى المبسّطة** للسرد العام، والعربية الكلاسيكية الأصلية للآيات والأحاديث والحوارات التاريخية الموثقة.\n`;
+  msg += `4. **بدون حشو**: كل دقيقة تستحق مكانها، لا تعليقات تفسيرية داخل السرد، التفاصيل تُحفظ للحظات الذروة.\n`;
+  msg += `5. **حدّد المصادر** التي استندت إليها في نهاية النص (آيات + أحاديث + كتب التفسير والتاريخ).\n\n`;
+  msg += `⚠️ مهم: الدقة قبل السرعة، المصدر قبل الذاكرة، التشكيل المتحقَّق قبل التخمين. إذا لم تكن متأكداً من آية أو حديث، تحقّق منه أو لا تضِفه.`;
+
+  showClaudeModal(msg);
+}
+
 function prepareClaudeMessage() {
   const story = val('story-name');
   if (!story) { alert('أدخل اسم القصة أولاً'); return; }
@@ -1742,7 +1818,8 @@ function exportPackageToFile() {
 
 function clearAll() {
   if (!confirm('مسح كل البيانات؟')) return;
-  ['story-name','hook-line','ep-current-link','ep-prev-link','ep-next-link','script-text'].forEach(id => setVal(id, ''));
+  ['story-name','hook-line','ep-current-link','ep-prev-link','ep-next-link','script-text','real-duration'].forEach(id => setVal(id, ''));
+  lastScriptDuration = 0;
   getEl('file-info').style.display = 'none';
   getEl('quality-report').innerHTML = '';
   getEl('output-area').innerHTML = '';
@@ -1793,8 +1870,8 @@ function analyzeVideo() {
 
   let ec = [], eh = '', si = '';
   if (sc.length > 100) {
-    const wc = sc.split(/\s+/).length, dur = wc / 150;
-    let tc; if (dur < 5) tc = 3; else if (dur < 8) tc = 4; else if (dur < 12) tc = 6; else if (dur < 18) tc = 8; else tc = 10;
+    const wc = sc.split(/\s+/).length, dur = wc / 105;
+    let tc; if (dur < 4) tc = 3; else if (dur < 7) tc = 4; else if (dur < 11) tc = 5; else if (dur < 16) tc = 7; else tc = 9;
     eh = extractHook(sc).hook;
     ec = extractChapters(sc, tc, dur);
     si = ` (مدعوم بـ ${wc} كلمة)`;
