@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مساعد قناة أثر - v5.0</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #faf8f3;
+  color: #2a2a2a;
+  line-height: 1.6;
+  padding: 16px;
+  min-height: 100vh;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #633806 0%, #854F0B 100%);
+  color: #fff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.logo-svg { width: 48px; height: 48px; flex-shrink: 0; }
+.header h1 { font-size: 22px; font-weight: 600; margin: 0; }
+.header .version { background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 99px; font-size: 12px; margin-right: 8px; }
+.header p { font-size: 13px; opacity: 0.9; margin: 4px 0 0; }
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f0ebe0;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+.mode-tab {
+  flex: 1;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.mode-tab.active { background: #fff; color: #633806; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.mode-tab:hover:not(.active) { background: rgba(255,255,255,0.5); }
+
+/* Cards */
+.card {
+  background: #fff;
+  border: 1px solid #e5e0d3;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card h2 { font-size: 16px; font-weight: 600; margin: 0 0 12px; color: #633806; display: flex; align-items: center; gap: 8px; }
+.card h3 { font-size: 14px; font-weight: 600; margin: 12px 0 8px; color: #444; }
+
+/* Forms */
+label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d4cfc0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #2a2a2a;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: #854F0B; }
+textarea { min-height: 80px; resize: vertical; }
+.field { margin-bottom: 12px; }
+.row { display: grid; gap: 12px; margin-bottom: 12px; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.row-3 { grid-template-columns: 2fr 1fr 1fr; }
+
+/* Buttons */
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.btn-primary { background: #854F0B; color: #fff; }
+.btn-primary:hover { background: #633806; }
+.btn-secondary { background: #fff; color: #633806; border: 1px solid #854F0B; }
+.btn-secondary:hover { background: #faf3e7; }
+.btn-small { padding: 6px 12px; font-size: 12px; }
+.btn-icon { padding: 6px 10px; font-size: 12px; background: #f5f0e3; color: #633806; }
+.btn-icon:hover { background: #ebe3cc; }
+.btn-danger { background: #fceaea; color: #a32d2d; }
+.btn-danger:hover { background: #f5d5d5; }
+.btn-claude { background: #d97706; color: #fff; }
+.btn-claude:hover { background: #b45309; }
+
+/* Upload area */
+.upload-area {
+  background: #fdf5e6;
+  border: 2px dashed #BA7517;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.upload-area .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.upload-area .upload-header strong { color: #633806; font-size: 14px; }
+.file-info {
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #633806;
+  margin-bottom: 8px;
+  display: none;
+}
+
+/* Platform cards */
+.platforms { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.platform {
+  padding: 10px 12px;
+  border: 1px solid #d4cfc0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  background: #fff;
+  font-size: 13px;
+  user-select: none;
+  transition: all 0.15s;
+}
+.platform.selected { background: #faeeda; border-color: #854F0B; color: #633806; font-weight: 600; }
+.platform-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+/* Output */
+.output-card {
+  background: #fff;
+  border: 1px solid #e5e0d3;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.output-section { padding: 12px 0; border-bottom: 1px solid #f0ebe0; }
+.output-section:last-child { border: none; }
+.output-section h3 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+/* Suggestion cards */
+.suggestion {
+  background: #faf6ec;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.suggestion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+.suggestion-label { font-size: 12px; color: #666; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: 500;
+}
+.tag-classic { background: #e6f1fb; color: #0c447c; }
+.tag-bold { background: #fcebeb; color: #791f1f; }
+.tag-keyword { background: #eaf3de; color: #27500a; }
+.length-meter { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; }
+.lm-good { background: #eaf3de; color: #27500a; }
+.lm-warn { background: #faeeda; color: #633806; }
+.lm-bad { background: #fcebeb; color: #791f1f; }
+.suggestion-text { font-size: 14px; line-height: 1.7; white-space: pre-wrap; color: #2a2a2a; }
+
+/* Content blocks */
+.content-block {
+  background: #f9f5eb;
+  padding: 12px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  font-size: 13px;
+  line-height: 1.8;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* Hashtag pills */
+.hashtag {
+  display: inline-block;
+  background: #faeeda;
+  color: #633806;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  margin: 2px;
+}
+
+/* Tier cards */
+.tier { background: #f9f5eb; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; }
+.tier-header { font-size: 11px; color: #888; margin-bottom: 4px; display: flex; gap: 6px; align-items: center; }
+.tier-badge { background: #854F0B; color: #fff; padding: 1px 7px; border-radius: 99px; font-size: 10px; }
+
+/* Alerts */
+.alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  border-right: 3px solid;
+}
+.alert-success { background: #eaf3de; color: #27500a; border-color: #27500a; }
+.alert-warn { background: #faeeda; color: #633806; border-color: #BA7517; }
+.alert-danger { background: #fcebeb; color: #791f1f; border-color: #a32d2d; }
+.alert-info { background: #e6f1fb; color: #0c447c; border-color: #185fa5; }
+
+/* Chapters */
+.chapter-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  background: #f9f5eb;
+  padding: 6px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+.chapter-row input { padding: 5px 8px; font-size: 13px; background: #fff; }
+.chapter-row input.time { text-align: center; font-family: monospace; font-weight: 600; color: #633806; }
+
+/* Episode list */
+.ep-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #f9f5eb;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.ep-item strong { color: #633806; }
+.ep-item .url { color: #888; font-size: 11px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Library cards */
+.lib-card {
+  background: #faf6ec;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.lib-card:hover { background: #faeeda; border-color: #854F0B; }
+.lib-card .lib-meta { font-size: 11px; color: #888; margin-bottom: 4px; }
+.lib-card .lib-text { font-size: 13px; color: #2a2a2a; }
+
+.cat-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.cat-tab {
+  padding: 4px 12px;
+  font-size: 12px;
+  background: #fff;
+  border: 1px solid #d4cfc0;
+  border-radius: 99px;
+  cursor: pointer;
+  color: #555;
+  font-family: inherit;
+}
+.cat-tab.active { background: #854F0B; color: #fff; border-color: #854F0B; }
+
+.ref-type-badge { font-size: 10px; padding: 2px 6px; border-radius: 99px; }
+.ref-quran { background: #eaf3de; color: #27500a; }
+.ref-hadith { background: #fcebeb; color: #791f1f; }
+.ref-book { background: #e6f1fb; color: #0c447c; }
+.ref-tafsir { background: #faeeda; color: #633806; }
+
+/* Dashboard */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.dash-card {
+  background: #fff;
+  border: 1px solid #e5e0d3;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.dash-value { font-size: 22px; font-weight: 700; color: #633806; margin: 4px 0; }
+.dash-label { font-size: 12px; color: #888; }
+
+/* Calendar */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
+.cal-day {
+  background: #f9f5eb;
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 70px;
+  font-size: 11px;
+}
+.cal-day.optimal { background: #faeeda; border: 1px solid #BA7517; }
+.cal-day .day-name { font-weight: 600; color: #555; margin-bottom: 4px; }
+
+/* Thumbnail analyzer */
+.thumb-preview {
+  aspect-ratio: 16/9;
+  background: #f0ebe0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 6px;
+}
+.thumb-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-score {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(99, 56, 6, 0.95);
+  color: #faeeda;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.thumb-winner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #faeeda;
+  color: #633806;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Quality */
+.quality-bar { height: 8px; background: #f0ebe0; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.quality-fill { height: 100%; transition: width 0.3s; }
+
+/* Top icons */
+.top-icons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.top-icon-btn {
+  background: #fff;
+  border: 1px solid #d4cfc0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #633806;
+}
+.top-icon-btn:hover { background: #faf6ec; }
+
+/* Panels */
+.panel {
+  background: #fff;
+  border: 1px solid #e5e0d3;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: none;
+}
+.panel.open { display: block; }
+.panel h2 { margin-bottom: 12px; }
+
+/* Compare */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.compare-cell {
+  background: #f9f5eb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  border-right: 3px solid;
+}
+.compare-cell.before { border-color: #a32d2d; }
+.compare-cell.after { border-color: #27500a; }
+
+/* Action bar */
+.action-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.action-bar button { flex: 1; min-width: 120px; }
+
+/* Saved indicator */
+.save-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #27500a;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+.save-indicator.show { opacity: 1; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .row-2, .row-3 { grid-template-columns: 1fr; }
+  .header h1 { font-size: 18px; }
+  .mode-tab { font-size: 12px; padding: 8px 10px; }
+  .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+  .platforms { grid-template-columns: repeat(2, 1fr); }
+}
+
+.hidden { display: none !important; }
+.text-muted { color: #888; font-size: 11px; }
+.mt-8 { margin-top: 8px; }
+.mb-8 { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(100, 100) rotate(45)">
+        <rect x="-20" y="-60" width="40" height="40" fill="#633806"/>
+        <rect x="-60" y="-20" width="40" height="40" fill="#A56826"/>
+        <rect x="-20" y="-20" width="40" height="40" fill="#854F0B"/>
+        <rect x="20" y="-20" width="80" height="40" fill="#9D5E10"/>
+        <rect x="-20" y="20" width="40" height="80" fill="#BA7517"/>
+        <rect x="20" y="20" width="40" height="40" fill="#D49642"/>
+        <rect x="60" y="20" width="40" height="20" fill="#EFA84A"/>
+        <rect x="80" y="0" width="20" height="20" fill="#EFA84A"/>
+      </g>
+    </svg>
+    <div style="flex: 1;">
+      <h1>مساعد قناة أثر <span class="version">v5.0</span></h1>
+      <p>أداة SEO وإنتاج متكاملة - بنك مراجع + 7 منصات + Dashboard</p>
+    </div>
+  </div>
+
+  <!-- TOP ICONS -->
+  <div class="top-icons">
+    <button class="top-icon-btn" onclick="togglePanel('refs-panel')">📚 بنك المراجع</button>
+    <button class="top-icon-btn" onclick="togglePanel('hooks-panel')">🔖 مكتبة الهوكات</button>
+    <button class="top-icon-btn" onclick="togglePanel('history-panel')">🕓 السجل</button>
+    <button class="top-icon-btn" onclick="togglePanel('settings-panel')">⚙️ الإعدادات</button>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div class="panel" id="settings-panel">
+    <h2>⚙️ الإعدادات والروابط الثابتة</h2>
+    <div class="row row-2">
+      <div class="field"><label>رابط القناة</label><input type="text" id="set-channel" placeholder="https://youtube.com/@athar"></div>
+      <div class="field"><label>قائمة قصص الأنبياء</label><input type="text" id="set-prophets"></div>
+      <div class="field"><label>قائمة علامات الساعة</label><input type="text" id="set-signs"></div>
+      <div class="field"><label>قائمة الأمم البائدة</label><input type="text" id="set-nations"></div>
+      <div class="field"><label>قائمة الصحابة</label><input type="text" id="set-companions"></div>
+      <div class="field"><label>قائمة الغزوات</label><input type="text" id="set-battles"></div>
+      <div class="field"><label>Instagram</label><input type="text" id="set-insta"></div>
+      <div class="field"><label>Facebook</label><input type="text" id="set-fb"></div>
+      <div class="field"><label>TikTok</label><input type="text" id="set-tiktok"></div>
+      <div class="field"><label>Twitter/X</label><input type="text" id="set-twitter"></div>
+      <div class="field"><label>Telegram</label><input type="text" id="set-telegram"></div>
+      <div class="field"><label>WhatsApp</label><input type="text" id="set-whatsapp"></div>
+    </div>
+    <button class="btn-primary" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+  </div>
+
+  <!-- REFERENCES PANEL -->
+  <div class="panel" id="refs-panel">
+    <h2>📚 بنك المراجع الإسلامية - 100+ مرجع</h2>
+    <p class="text-muted mb-8">من علماء أهل السنة الموثوقين: البخاري، مسلم، ابن كثير، الطبري، القرطبي، الذهبي، ابن حجر...</p>
+    <div class="cat-tabs">
+      <button class="cat-tab active" data-refcat="all" onclick="filterRefs(this)">الكل</button>
+      <button class="cat-tab" data-refcat="nation" onclick="filterRefs(this)">أمم بائدة</button>
+      <button class="cat-tab" data-refcat="prophet" onclick="filterRefs(this)">أنبياء</button>
+      <button class="cat-tab" data-refcat="sign" onclick="filterRefs(this)">علامات</button>
+      <button class="cat-tab" data-refcat="companion" onclick="filterRefs(this)">صحابة</button>
+      <button class="cat-tab" data-refcat="battle" onclick="filterRefs(this)">غزوات</button>
+      <button class="cat-tab" data-refcat="miracle" onclick="filterRefs(this)">معجزات</button>
+    </div>
+    <div id="refs-list" style="max-height: 400px; overflow-y: auto;"></div>
+  </div>
+
+  <!-- HOOKS PANEL -->
+  <div class="panel" id="hooks-panel">
+    <h2>🔖 مكتبة الهوكات - 50+ هوك</h2>
+    <button class="btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="randomHook()">🎲 ولّد هوك عشوائي</button>
+    <div class="cat-tabs">
+      <button class="cat-tab active" data-hookcat="all" onclick="filterHooks(this)">الكل</button>
+      <button class="cat-tab" data-hookcat="nation" onclick="filterHooks(this)">أمم</button>
+      <button class="cat-tab" data-hookcat="prophet" onclick="filterHooks(this)">أنبياء</button>
+      <button class="cat-tab" data-hookcat="sign" onclick="filterHooks(this)">علامات</button>
+      <button class="cat-tab" data-hookcat="companion" onclick="filterHooks(this)">صحابة</button>
+      <button class="cat-tab" data-hookcat="battle" onclick="filterHooks(this)">غزوات</button>
+      <button class="cat-tab" data-hookcat="miracle" onclick="filterHooks(this)">معجزات</button>
+    </div>
+    <div id="hooks-list" style="max-height: 400px; overflow-y: auto;"></div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="panel" id="history-panel">
+    <h2>🕓 سجل الحلقات</h2>
+    <div id="history-list">لا توجد حلقات محفوظة بعد.</div>
+  </div>
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="create" onclick="switchMode(this)">✨ إنشاء</button>
+    <button class="mode-tab" data-mode="analyze" onclick="switchMode(this)">🔍 تحليل</button>
+    <button class="mode-tab" data-mode="thumbnail" onclick="switchMode(this)">🖼️ A/B Thumbnail</button>
+    <button class="mode-tab" data-mode="shorts" onclick="switchMode(this)">✂️ مولد Shorts</button>
+    <button class="mode-tab" data-mode="dashboard" onclick="switchMode(this)">📊 Dashboard</button>
+    <button class="mode-tab" data-mode="calendar" onclick="switchMode(this)">📅 جدول النشر</button>
+    <button class="mode-tab" data-mode="quality" onclick="switchMode(this)">✅ فاحص الجودة</button>
+  </div>
+
+  <!-- ============ CREATE MODE ============ -->
+  <div id="create-mode">
+    <div class="card">
+      <h2>📝 بيانات الحلقة</h2>
+
+      <div class="row row-3">
+        <div class="field">
+          <label>اسم القصة <span style="color: #a32d2d;">*</span></label>
+          <input type="text" id="story-name" placeholder="مثلاً: قوم عاد">
+        </div>
+        <div class="field">
+          <label>النوع</label>
+          <select id="topic-type">
+            <option value="nation">أمة بائدة</option>
+            <option value="prophet">نبي</option>
+            <option value="companion">صحابي</option>
+            <option value="sign">علامة الساعة</option>
+            <option value="battle">غزوة</option>
+            <option value="miracle">معجزة</option>
+            <option value="general">عام</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>رقم الحلقة</label>
+          <select id="ep-num" onchange="toggleEpisodeFields()">
+            <option value="1">الحلقة 1</option>
+            <option value="2">الحلقة 2</option>
+            <option value="3">الحلقة 3</option>
+            <option value="single">منفردة</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="sensitivity-alert"></div>
+
+      <!-- SCRIPT UPLOAD -->
+      <div class="upload-area">
+        <div class="upload-header">
+          <strong>📄 نص الحلقة (تحليل ذكي)</strong>
+          <button class="btn-icon" onclick="document.getElementById('script-file').click()">📁 اختيار ملف</button>
+          <input type="file" id="script-file" accept=".txt,.md" style="display:none" onchange="handleFileUpload(event, 'script-text', 'file-info')">
+        </div>
+        <p class="text-muted mb-8">يستخرج: هوك + فصول حقيقية من المحتوى + تقرير جودة</p>
+        <div class="file-info" id="file-info"></div>
+        <textarea id="script-text" placeholder="الصق نص الحلقة كاملاً هنا..."></textarea>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <button class="btn-secondary" style="flex: 1;" onclick="smartAnalyzeScript()">🧠 تحليل ذكي عميق</button>
+          <button class="btn-claude" style="flex: 1;" onclick="prepareEnhanceScriptMessage()">✨ حسّن النص بنمط أثر + المراجع</button>
+        </div>
+      </div>
+
+      <div id="quality-report"></div>
+
+      <div class="field">
+        <label>الهوك الافتتاحي</label>
+        <textarea id="hook-line" placeholder="مثال: تخيّل... قوم كانوا أطول من النخل"></textarea>
+      </div>
+
+      <!-- SERIES LINKS -->
+      <div id="series-links-section">
+        <h3>🔗 روابط السلسلة</h3>
+        <div class="row row-3">
+          <div class="field"><label class="text-muted">الحالية</label><input type="text" id="ep-current-link"></div>
+          <div class="field"><label class="text-muted">السابقة</label><input type="text" id="ep-prev-link"></div>
+          <div class="field"><label class="text-muted">التالية</label><input type="text" id="ep-next-link"></div>
+        </div>
+      </div>
+
+      <!-- RELATED EPS -->
+      <div id="related-eps-section" class="hidden">
+        <h3>🔗 حلقات ذات صلة</h3>
+        <div id="related-list"></div>
+        <div class="row" style="grid-template-columns: 1fr 1fr auto; margin-top: 8px;">
+          <input type="text" id="related-name" placeholder="اسم الحلقة">
+          <input type="text" id="related-link" placeholder="رابط">
+          <button class="btn-secondary btn-small" onclick="addRelated()">➕</button>
+        </div>
+      </div>
+
+      <!-- CHANNEL EPS -->
+      <h3 style="margin-top: 14px;">📺 حلقات أخرى من القناة</h3>
+      <div id="channel-list"></div>
+      <div class="row" style="grid-template-columns: 1fr 1fr auto;">
+        <input type="text" id="channel-name" placeholder="اسم الحلقة">
+        <input type="text" id="channel-link" placeholder="رابط">
+        <button class="btn-secondary btn-small" onclick="addChannel()">➕</button>
+      </div>
+
+      <!-- CHAPTERS -->
+      <h3 style="margin-top: 14px;">⏰ الفصول الزمنية</h3>
+      <div class="row" style="grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin-bottom: 8px;">
+        <label style="margin: 0; white-space: nowrap;">المدة الفعلية للحلقة:</label>
+        <input type="text" id="real-duration" placeholder="مثلاً 9:30" style="max-width: 120px;" oninput="onRealDurationChange()">
+      </div>
+      <p class="text-muted mb-8">اكتب المدة الحقيقية (دقيقة:ثانية) لتوزيع الفصول بدقة. لو فاضية، يُحسب تلقائياً من النص.</p>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="btn-secondary btn-small" onclick="addChapter()">➕ فصل</button>
+        <button class="btn-secondary btn-small" onclick="redistributeChapters()">🔀 توزيع تلقائي</button>
+      </div>
+      <div id="chapters-list"></div>
+      <p class="text-muted mt-8" id="chapters-summary"></p>
+    </div>
+
+    <!-- PLATFORMS -->
+    <div class="card">
+      <h2>🎯 المنصات (7 منصات)</h2>
+      <div class="platforms">
+        <div class="platform selected" data-platform="youtube" onclick="togglePlatform(this)"><span class="platform-icon">📺</span>YouTube</div>
+        <div class="platform selected" data-platform="instagram" onclick="togglePlatform(this)"><span class="platform-icon">📷</span>Instagram</div>
+        <div class="platform selected" data-platform="facebook" onclick="togglePlatform(this)"><span class="platform-icon">👥</span>Facebook</div>
+        <div class="platform selected" data-platform="tiktok" onclick="togglePlatform(this)"><span class="platform-icon">🎵</span>TikTok</div>
+        <div class="platform" data-platform="twitter" onclick="togglePlatform(this)"><span class="platform-icon">𝕏</span>Twitter</div>
+        <div class="platform" data-platform="whatsapp" onclick="togglePlatform(this)"><span class="platform-icon">💬</span>WhatsApp</div>
+        <div class="platform" data-platform="telegram" onclick="togglePlatform(this)"><span class="platform-icon">✈️</span>Telegram</div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-primary" onclick="generateContent()">✨ توليد حزمة SEO كاملة</button>
+        <button class="btn-claude" onclick="prepareClaudeMessage()">🤖 جهّز رسالة لـ Claude</button>
+        <button class="btn-secondary" onclick="exportPackageToFile()">💾 تصدير</button>
+        <button class="btn-icon" onclick="clearAll()">🔄 مسح</button>
+      </div>
+    </div>
+
+    <div id="output-area"></div>
+  </div>
+
+  <!-- ============ ANALYZE MODE ============ -->
+  <div id="analyze-mode" class="hidden">
+    <div class="card">
+      <h2>🔍 تحليل فيديو سابق</h2>
+      <div class="field"><label>اسم القصة *</label><input type="text" id="ana-story"></div>
+      <div class="row row-2">
+        <div class="field"><label>النوع</label><select id="ana-type"><option value="nation">أمة بائدة</option><option value="prophet">نبي</option><option value="companion">صحابي</option><option value="sign">علامة</option><option value="battle">غزوة</option><option value="miracle">معجزة</option><option value="general">عام</option></select></div>
+        <div class="field"><label>رابط الفيديو</label><input type="text" id="ana-link"></div>
+      </div>
+      <div class="field"><label>العنوان الحالي *</label><input type="text" id="ana-title" oninput="updateTitleMeter('ana-title','ana-title-meter')"><div id="ana-title-meter" class="mt-8"></div></div>
+      <div class="field"><label>الوصف</label><textarea id="ana-description"></textarea></div>
+      <div class="row row-2">
+        <div class="field"><label>التاغات</label><textarea id="ana-tags"></textarea></div>
+        <div class="field"><label>الهاشتاغات</label><textarea id="ana-hashtags"></textarea></div>
+      </div>
+      <div class="upload-area">
+        <div class="upload-header">
+          <strong>📄 نص الحلقة</strong>
+          <button class="btn-icon" onclick="document.getElementById('ana-script-file').click()">📁 ملف</button>
+          <input type="file" id="ana-script-file" accept=".txt,.md" style="display:none" onchange="handleFileUpload(event,'ana-script','ana-file-info')">
+        </div>
+        <div class="file-info" id="ana-file-info"></div>
+        <textarea id="ana-script"></textarea>
+      </div>
+      <div class="row row-2">
+        <div class="field"><label>المشاهدات</label><input type="text" id="ana-views"></div>
+        <div class="field"><label>CTR %</label><input type="text" id="ana-ctr"></div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" onclick="analyzeVideo()">🔬 تحليل وتحسين</button>
+        <button class="btn-claude" onclick="prepareClaudeAnalyzeMessage()">🤖 جهّز رسالة لـ Claude</button>
+        <button class="btn-secondary" onclick="importToCreate()">↩️ استيراد</button>
+      </div>
+    </div>
+    <div id="analyze-output"></div>
+  </div>
+
+  <!-- ============ THUMBNAIL A/B ============ -->
+  <div id="thumbnail-mode" class="hidden">
+    <div class="card">
+      <h2>🖼️ فاحص A/B للصور المصغرة (تحليل بصري حقيقي)</h2>
+      <p class="text-muted mb-8">ارفع 2-3 صور وسيحللها بـ 10 معايير ويختار الأفضل</p>
+      <div class="row row-3">
+        <div class="field">
+          <label>صورة A</label>
+          <input type="file" accept="image/*" onchange="handleThumb(event,'a')">
+          <div id="thumb-a-preview"></div>
+        </div>
+        <div class="field">
+          <label>صورة B</label>
+          <input type="file" accept="image/*" onchange="handleThumb(event,'b')">
+          <div id="thumb-b-preview"></div>
+        </div>
+        <div class="field">
+          <label>صورة C (اختياري)</label>
+          <input type="file" accept="image/*" onchange="handleThumb(event,'c')">
+          <div id="thumb-c-preview"></div>
+        </div>
+      </div>
+      <button class="btn-primary" style="width: 100%;" onclick="analyzeThumbnails()">🔬 حلل وقارن (10 معايير)</button>
+    </div>
+    <div id="thumbnail-output"></div>
+    <canvas id="thumb-canvas" style="display: none;"></canvas>
+  </div>
+
+  <!-- ============ SHORTS GENERATOR ============ -->
+  <div id="shorts-mode" class="hidden">
+    <div class="card">
+      <h2>✂️ مولّد سكربتات Shorts من الحلقة الطويلة</h2>
+      <p class="text-muted mb-8">ارفع نص الحلقة الكاملة واستخرج 3 سكربتات Shorts جاهزة</p>
+      <div class="row row-2">
+        <div class="field"><label>اسم القصة *</label><input type="text" id="shorts-story"></div>
+        <div class="field"><label>النوع</label><select id="shorts-type"><option value="nation">أمة</option><option value="prophet">نبي</option><option value="companion">صحابي</option><option value="sign">علامة</option><option value="battle">غزوة</option><option value="miracle">معجزة</option><option value="general">عام</option></select></div>
+      </div>
+      <div class="upload-area">
+        <div class="upload-header">
+          <strong>📄 نص الحلقة الكاملة *</strong>
+          <button class="btn-icon" onclick="document.getElementById('shorts-script-file').click()">📁 ملف</button>
+          <input type="file" id="shorts-script-file" accept=".txt,.md" style="display:none" onchange="handleFileUpload(event,'shorts-script','shorts-file-info')">
+        </div>
+        <div class="file-info" id="shorts-file-info"></div>
+        <textarea id="shorts-script" placeholder="الصق نص الحلقة..."></textarea>
+      </div>
+      <button class="btn-primary" style="width: 100%;" onclick="generateShorts()">✂️ استخرج 3 سكربتات</button>
+    </div>
+    <div id="shorts-output"></div>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div id="dashboard-mode" class="hidden">
+    <div class="card">
+      <h2>📊 Dashboard أداء الحلقات</h2>
+      <p class="text-muted mb-8">أدخل بيانات حلقاتك السابقة لرؤية الإحصائيات والـRevenue التقديري</p>
+      <div class="row" style="grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr auto;">
+        <input type="text" id="dash-name" placeholder="اسم الحلقة">
+        <input type="number" id="dash-views" placeholder="مشاهدات">
+        <input type="number" step="0.1" id="dash-ctr" placeholder="CTR %">
+        <input type="number" step="0.1" id="dash-watch" placeholder="Watch %">
+        <input type="date" id="dash-date">
+        <button class="btn-secondary btn-small" onclick="addDashEp()">➕</button>
+      </div>
+      <div id="dashboard-content" style="margin-top: 16px;"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALENDAR ============ -->
+  <div id="calendar-mode" class="hidden">
+    <div class="card">
+      <h2>📅 جدول النشر البصري</h2>
+      <p class="text-muted mb-8">⭐ الأوقات المثلى للقنوات الإسلامية العربية (الخميس/الجمعة)</p>
+      <div class="calendar-grid">
+        <div class="cal-day"><div class="day-name">السبت</div></div>
+        <div class="cal-day"><div class="day-name">الأحد</div></div>
+        <div class="cal-day"><div class="day-name">الإثنين</div></div>
+        <div class="cal-day"><div class="day-name">الثلاثاء</div></div>
+        <div class="cal-day"><div class="day-name">الأربعاء</div></div>
+        <div class="cal-day optimal"><div class="day-name">🌟 الخميس</div>حلقة طويلة 8م</div>
+        <div class="cal-day optimal"><div class="day-name">🌟 الجمعة</div>Shorts بعد الصلاة</div>
+      </div>
+      <div class="alert alert-info">
+        <strong>💡 توصيات النشر:</strong>
+        <ul style="margin: 8px 0 0; padding-right: 18px; line-height: 1.8;">
+          <li><strong>الحلقات الطويلة:</strong> الخميس 8-11م (قبل الجمعة)</li>
+          <li><strong>Shorts:</strong> الجمعة بعد صلاة الجمعة (1-3م)</li>
+          <li><strong>Community Posts:</strong> يومياً بعد العصر</li>
+          <li><strong>تجنّب:</strong> رمضان نهاراً (التركيز على الإفطار)</li>
+          <li><strong>الذروة:</strong> أول 10 من رمضان + الأسبوع قبل العيد</li>
+          <li><strong>المواسم:</strong> ذو الحجة (الحج) - رمضان - محرم (الهجرة)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ QUALITY CHECKER ============ -->
+  <div id="quality-mode" class="hidden">
+    <div class="card">
+      <h2>✅ فاحص الجودة قبل النشر (15 نقطة فحص)</h2>
+      <div class="field"><label>العنوان</label><input type="text" id="qual-title"></div>
+      <div class="field"><label>الوصف</label><textarea id="qual-desc" style="min-height: 150px;"></textarea></div>
+      <div class="row row-2">
+        <div class="field"><label>التاغات</label><textarea id="qual-tags"></textarea></div>
+        <div class="field"><label>الهاشتاغات</label><textarea id="qual-hashtags"></textarea></div>
+      </div>
+      <button class="btn-primary" style="width: 100%;" onclick="runQualityCheck()">🛡️ فحص 15 نقطة</button>
+    </div>
+    <div id="quality-output"></div>
+  </div>
+
+</div>
+
+<div class="save-indicator" id="save-indicator">✓ تم الحفظ</div>
+
+<!-- CLAUDE MESSAGE MODAL -->
+<div id="claude-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; padding:20px; overflow-y:auto;">
+  <div style="max-width:700px; margin:30px auto; background:#fff; border-radius:12px; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h2 style="font-size:18px; color:#633806; margin:0;">🤖 رسالة جاهزة لـ Claude</h2>
+      <button class="btn-icon" onclick="document.getElementById('claude-modal').style.display='none'">✕ إغلاق</button>
+    </div>
+    <div class="alert alert-info" style="margin-bottom:12px;">
+      <strong>الخطوات:</strong>
+      <ol style="margin:6px 0 0; padding-right:18px; line-height:1.8;">
+        <li>اضغط <strong>"📋 نسخ الرسالة"</strong> أدناه</li>
+        <li>افتح محادثة Claude (claude.ai أو التطبيق)</li>
+        <li>الصق الرسالة وأرسلها</li>
+        <li>Claude سيكتب لك عناوين ذكية مخصصة + كل الحزمة</li>
+      </ol>
+    </div>
+    <textarea id="claude-message-text" style="width:100%; min-height:320px; font-size:13px; line-height:1.7; padding:14px; border:1px solid #d4cfc0; border-radius:8px; background:#faf6ec;" readonly></textarea>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button class="btn-claude" style="flex:1;" onclick="copyClaudeMessage()">📋 نسخ الرسالة</button>
+      <button class="btn-secondary" onclick="document.getElementById('claude-modal').style.display='none'">تم</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+const STORAGE = { settings: 'athar_settings_v5', episodes: 'athar_episodes_v5', dashboard: 'athar_dashboard_v5' };
+let chapters = [];
+let relatedEps = [];
+let channelEps = [];
+let dashEps = [];
+let thumbImages = { a: null, b: null, c: null };
+let lastScriptDuration = 0;
+
+// ===== REFERENCES BANK =====
+const REFS = {
+  nation: [
+    { type: 'quran', name: 'الذاريات: 41-42', text: 'وفي عاد إذ أرسلنا عليهم الريح العقيم...', source: 'القرآن الكريم - سورة الذاريات' },
+    { type: 'quran', name: 'الأحقاف: 21-25', text: 'واذكر أخا عاد إذ أنذر قومه بالأحقاف...', source: 'القرآن الكريم - سورة الأحقاف' },
+    { type: 'quran', name: 'هود: 50-60', text: 'وإلى عاد أخاهم هودا...', source: 'القرآن الكريم - سورة هود' },
+    { type: 'quran', name: 'الشعراء: 123-140', text: 'كذبت عاد المرسلين...', source: 'القرآن الكريم - سورة الشعراء' },
+    { type: 'quran', name: 'الحاقة: 6-8', text: 'وأما عاد فأهلكوا بريح صرصر عاتية...', source: 'القرآن الكريم - سورة الحاقة' },
+    { type: 'quran', name: 'فصلت: 15-16', text: 'فأما عاد فاستكبروا في الأرض بغير الحق...', source: 'القرآن الكريم - سورة فصلت' },
+    { type: 'quran', name: 'الأعراف: 73-79 - ثمود', text: 'وإلى ثمود أخاهم صالحاً...', source: 'القرآن الكريم - سورة الأعراف' },
+    { type: 'quran', name: 'هود: 61-68 - ثمود', text: 'وإلى ثمود أخاهم صالحاً قال يا قوم اعبدوا الله...', source: 'القرآن الكريم - سورة هود' },
+    { type: 'quran', name: 'الحجر: 80-84', text: 'ولقد كذب أصحاب الحجر المرسلين...', source: 'القرآن الكريم - سورة الحجر' },
+    { type: 'quran', name: 'القمر: 18-21 - عاد', text: 'كذبت عاد فكيف كان عذابي ونذر...', source: 'القرآن الكريم - سورة القمر' },
+    { type: 'hadith', name: 'حديث ريح صرصر', text: 'قال النبي ﷺ: نُصرت بالصبا وأُهلكت عاد بالدبور', source: 'صحيح البخاري (1035) ومسلم (900)' },
+    { type: 'tafsir', name: 'تفسير ابن كثير - قصة هود', text: 'كان قوم عاد أول من سكن الأرض بعد الطوفان، وكانوا أهل قوة وبأس وأجسام طويلة...', source: 'تفسير ابن كثير (774هـ)' },
+    { type: 'tafsir', name: 'تفسير الطبري - قوم عاد', text: 'كانوا قوماً جبارين، أطول الناس قامة وأشدهم بطشاً، يسكنون الأحقاف باليمن...', source: 'جامع البيان - الطبري (310هـ)' },
+    { type: 'tafsir', name: 'تفسير القرطبي - قصة لوط', text: 'وكانوا أول من فعل هذه الفاحشة من الناس، لم يسبقهم بها أحد من العالمين...', source: 'الجامع لأحكام القرآن - القرطبي (671هـ)' },
+    { type: 'tafsir', name: 'تفسير السعدي - الأمم البائدة', text: 'هذه القصص فيها عبر وعظات للمعتبرين، وآيات وحجج على قدرة الله...', source: 'تيسير الكريم الرحمن - السعدي (1376هـ)' },
+    { type: 'book', name: 'البداية والنهاية - قوم عاد', text: 'فصل في ذكر قصة عاد الأولى مع نبيهم هود عليه السلام وما حل بهم من العذاب...', source: 'البداية والنهاية - ابن كثير (774هـ)' },
+    { type: 'book', name: 'تاريخ الطبري - الأمم البائدة', text: 'كانت عاد أعظم الأمم بأساً وأشدها بطشاً، فلما عتوا أرسل الله عليهم الريح...', source: 'تاريخ الأمم والملوك - الطبري (310هـ)' },
+    { type: 'book', name: 'قصص الأنبياء - ابن كثير', text: 'لما أهلك الله عاداً قام مقامهم في البلاد ثمود وكانوا عرباً يسكنون الحجر...', source: 'قصص الأنبياء - ابن كثير (774هـ)' }
+  ],
+  prophet: [
+    { type: 'quran', name: 'سورة يوسف', text: 'نحن نقص عليك أحسن القصص بما أوحينا إليك هذا القرآن...', source: 'القرآن الكريم - سورة يوسف' },
+    { type: 'quran', name: 'سورة هود', text: 'تلك من أنباء الغيب نوحيها إليك ما كنت تعلمها أنت ولا قومك...', source: 'القرآن الكريم - سورة هود' },
+    { type: 'quran', name: 'سورة الأنبياء', text: 'لقد أنزلنا إليكم كتاباً فيه ذكركم أفلا تعقلون...', source: 'القرآن الكريم - سورة الأنبياء' },
+    { type: 'quran', name: 'سورة مريم - يحيى وزكريا', text: 'ذكر رحمت ربك عبده زكريا إذ نادى ربه نداء خفيا...', source: 'القرآن الكريم - سورة مريم' },
+    { type: 'quran', name: 'الأنبياء 83-84 - أيوب', text: 'وأيوب إذ نادى ربه أني مسني الضر وأنت أرحم الراحمين...', source: 'القرآن الكريم - سورة الأنبياء' },
+    { type: 'hadith', name: 'حديث الإسراء والمعراج', text: 'بينما أنا عند البيت بين النائم واليقظان إذ سمعت قائلاً يقول: أحد الثلاثة بين الرجلين...', source: 'صحيح البخاري (3887) ومسلم (162)' },
+    { type: 'hadith', name: 'خلق آدم', text: 'إن الله خلق آدم من قبضة قبضها من جميع الأرض، فجاء بنو آدم على قدر الأرض...', source: 'سنن أبي داود (4693) - صحيح' },
+    { type: 'hadith', name: 'أول نبي رسول', text: 'يا رسول الله من أول نبي؟ قال: آدم. قلت: ثم من؟ قال: نوح. وبينهما عشرة قرون...', source: 'صحيح ابن حبان (6190)' },
+    { type: 'tafsir', name: 'قصص الأنبياء - ابن كثير', text: 'هذا كتاب قصص الأنبياء بدءاً من آدم عليه السلام وانتهاءً بسيد الأنبياء محمد ﷺ', source: 'قصص الأنبياء - ابن كثير (774هـ)' },
+    { type: 'tafsir', name: 'تفسير السعدي - الأنبياء', text: 'هؤلاء الرسل خواص خلق الله وصفوتهم، اصطفاهم الله للرسالة وأكرمهم بالنبوة...', source: 'تيسير الكريم الرحمن - السعدي (1376هـ)' },
+    { type: 'book', name: 'البداية والنهاية - الأنبياء', text: 'فصل في قصص الأنبياء من آدم إلى محمد ﷺ بترتيبهم الزمني', source: 'البداية والنهاية - ابن كثير' },
+    { type: 'book', name: 'قصص الأنبياء - النجار', text: 'دراسة معاصرة لقصص الأنبياء مرتبة ومحققة من المصادر الأصيلة', source: 'قصص الأنبياء - عبد الوهاب النجار' }
+  ],
+  sign: [
+    { type: 'hadith', name: 'حديث جبريل - علامات الساعة', text: 'أن تلد الأمة ربتها، وأن ترى الحفاة العراة العالة رعاء الشاء يتطاولون في البنيان', source: 'صحيح البخاري (50) ومسلم (8)' },
+    { type: 'hadith', name: 'حديث الدجال - النواس بن سمعان', text: 'ذكر رسول الله ﷺ الدجال ذات غداة فخفض فيه ورفع، حتى ظنناه في طائفة النخل', source: 'صحيح مسلم (2937)' },
+    { type: 'hadith', name: 'حديث المهدي', text: 'لو لم يبق من الدنيا إلا يوم لطول الله ذلك اليوم حتى يبعث فيه رجلاً مني', source: 'سنن أبي داود (4282) - صحيح' },
+    { type: 'hadith', name: 'نزول عيسى', text: 'والذي نفسي بيده ليوشكن أن ينزل فيكم ابن مريم حكماً عدلاً، فيكسر الصليب', source: 'صحيح البخاري (3448) ومسلم (155)' },
+    { type: 'hadith', name: 'حديث يأجوج ومأجوج', text: 'فتح اليوم من ردم يأجوج ومأجوج مثل هذه، وحلق بإصبعه الإبهام والتي تليها', source: 'صحيح البخاري (3346) ومسلم (2880)' },
+    { type: 'hadith', name: 'حديث الجساسة - تميم الداري', text: 'انطلقنا حتى أتينا الدير فإذا فيه أعظم إنسان رأيناه قط خَلْقاً وأشده وثاقاً', source: 'صحيح مسلم (2942)' },
+    { type: 'hadith', name: 'حديث الدابة', text: 'إن أول الآيات خروجاً طلوع الشمس من مغربها أو خروج الدابة على الناس ضحى', source: 'صحيح مسلم (2941)' },
+    { type: 'hadith', name: 'حديث الدخان', text: 'فارتقبوا يوم تأتي السماء بدخان مبين، يغشى الناس هذا عذاب أليم', source: 'صحيح البخاري (4825) ومسلم (2798)' },
+    { type: 'hadith', name: 'العشر آيات', text: 'إن الساعة لا تكون حتى تكونوا قبلها عشر آيات: الدخان، والدجال، والدابة، وطلوع الشمس...', source: 'صحيح مسلم (2901)' },
+    { type: 'quran', name: 'الكهف 94 - يأجوج ومأجوج', text: 'قالوا يا ذا القرنين إن يأجوج ومأجوج مفسدون في الأرض...', source: 'القرآن الكريم - سورة الكهف' },
+    { type: 'quran', name: 'الأنبياء 96 - يأجوج', text: 'حتى إذا فتحت يأجوج ومأجوج وهم من كل حدب ينسلون...', source: 'القرآن الكريم - سورة الأنبياء' },
+    { type: 'quran', name: 'النمل 82 - الدابة', text: 'وإذا وقع القول عليهم أخرجنا لهم دابة من الأرض تكلمهم...', source: 'القرآن الكريم - سورة النمل' },
+    { type: 'book', name: 'النهاية في الفتن - ابن كثير', text: 'كتاب جامع لأحاديث الفتن وأشراط الساعة الكبرى والصغرى', source: 'النهاية في الفتن والملاحم - ابن كثير' },
+    { type: 'book', name: 'فتح الباري - أشراط الساعة', text: 'باب علامات النبوة في الإسلام مع شرح مفصل لكل علامة من المصادر الموثوقة', source: 'فتح الباري شرح صحيح البخاري - ابن حجر (852هـ)' },
+    { type: 'book', name: 'شرح النووي على مسلم', text: 'شرح وتعليق على أحاديث الفتن وأشراط الساعة في صحيح مسلم', source: 'شرح صحيح مسلم - النووي (676هـ)' }
+  ],
+  companion: [
+    { type: 'hadith', name: 'فضل أبي بكر', text: 'لو كنت متخذاً من أهل الأرض خليلاً لاتخذت أبا بكر خليلاً، ولكن أخوة الإسلام', source: 'صحيح البخاري (3656) ومسلم (2382)' },
+    { type: 'hadith', name: 'فضل عمر', text: 'بينا أنا نائم رأيتني في الجنة فإذا امرأة تتوضأ إلى جانب قصر، فقلت لمن هذا القصر؟ فقالوا: لعمر', source: 'صحيح البخاري (3679) ومسلم (2395)' },
+    { type: 'hadith', name: 'فضل عثمان', text: 'ألا أستحي ممن تستحي منه الملائكة (يقصد عثمان رضي الله عنه)', source: 'صحيح مسلم (2401)' },
+    { type: 'hadith', name: 'فضل علي', text: 'لأعطين الراية رجلاً يحب الله ورسوله ويحبه الله ورسوله، يفتح الله على يديه', source: 'صحيح البخاري (3009) ومسلم (2406)' },
+    { type: 'hadith', name: 'العشرة المبشرين بالجنة', text: 'أبو بكر في الجنة، وعمر في الجنة، وعثمان في الجنة، وعلي في الجنة، وطلحة...', source: 'سنن الترمذي (3747) - صحيح' },
+    { type: 'hadith', name: 'فضائل خديجة', text: 'خير نسائها مريم بنت عمران، وخير نسائها خديجة بنت خويلد', source: 'صحيح البخاري (3432) ومسلم (2430)' },
+    { type: 'hadith', name: 'فضائل عائشة', text: 'فضل عائشة على النساء كفضل الثريد على سائر الطعام', source: 'صحيح البخاري (3411) ومسلم (2446)' },
+    { type: 'hadith', name: 'فضل أبي هريرة', text: 'بسطت ثوبي إلى الرسول ﷺ فما نسيت بعد ذلك حديثاً سمعته منه', source: 'صحيح البخاري (3648)' },
+    { type: 'book', name: 'سير أعلام النبلاء', text: 'تراجم موسعة لكبار الصحابة والتابعين وعلماء الأمة على مدار 28 جزءاً', source: 'سير أعلام النبلاء - الذهبي (748هـ)' },
+    { type: 'book', name: 'الإصابة في تمييز الصحابة', text: 'موسوعة جامعة لتراجم الصحابة الكرام، أكثر من 12000 ترجمة', source: 'الإصابة - ابن حجر العسقلاني (852هـ)' },
+    { type: 'book', name: 'الاستيعاب في معرفة الأصحاب', text: 'تراجم الصحابة الكرام مرتبة على حروف المعجم', source: 'الاستيعاب - ابن عبد البر (463هـ)' },
+    { type: 'book', name: 'أسد الغابة في معرفة الصحابة', text: 'موسوعة لتراجم الصحابة جمعت من مصادر متعددة', source: 'أسد الغابة - ابن الأثير (630هـ)' }
+  ],
+  battle: [
+    { type: 'quran', name: 'آل عمران 123-127 - بدر', text: 'ولقد نصركم الله ببدر وأنتم أذلة فاتقوا الله لعلكم تشكرون', source: 'القرآن الكريم - سورة آل عمران' },
+    { type: 'quran', name: 'آل عمران 152-153 - أحد', text: 'ولقد صدقكم الله وعده إذ تحسونهم بإذنه حتى إذا فشلتم وتنازعتم...', source: 'القرآن الكريم - سورة آل عمران' },
+    { type: 'quran', name: 'الأحزاب 9-27 - الخندق', text: 'يا أيها الذين آمنوا اذكروا نعمة الله عليكم إذ جاءتكم جنود فأرسلنا عليهم ريحاً', source: 'القرآن الكريم - سورة الأحزاب' },
+    { type: 'quran', name: 'التوبة 25-27 - حنين', text: 'لقد نصركم الله في مواطن كثيرة ويوم حنين إذ أعجبتكم كثرتكم...', source: 'القرآن الكريم - سورة التوبة' },
+    { type: 'quran', name: 'الفتح - الحديبية والفتح', text: 'إنا فتحنا لك فتحاً مبيناً ليغفر لك الله ما تقدم من ذنبك وما تأخر', source: 'القرآن الكريم - سورة الفتح' },
+    { type: 'hadith', name: 'غزوة بدر - حديث', text: 'لما كان يوم بدر نظر رسول الله ﷺ إلى المشركين وهم ألف وأصحابه ثلاثمئة وتسعة عشر', source: 'صحيح مسلم (1763)' },
+    { type: 'hadith', name: 'يوم أحد', text: 'كُسرت يوم أحد رباعية النبي ﷺ وشُج في رأسه، فجعل يسلت الدم عنه ويقول...', source: 'صحيح مسلم (1791)' },
+    { type: 'hadith', name: 'الحديبية', text: 'لما كاتب رسول الله ﷺ سهيل بن عمرو يوم الحديبية على القضية...', source: 'صحيح البخاري (2731)' },
+    { type: 'book', name: 'السيرة النبوية - ابن هشام', text: 'أقدم وأشهر كتاب في السيرة النبوية، يحوي تفاصيل كاملة لغزوات النبي ﷺ', source: 'السيرة النبوية - ابن هشام (218هـ)' },
+    { type: 'book', name: 'زاد المعاد', text: 'فصول عميقة في فقه السيرة والغزوات والدروس المستفادة', source: 'زاد المعاد - ابن القيم (751هـ)' },
+    { type: 'book', name: 'المغازي - الواقدي', text: 'تفاصيل دقيقة لأحداث الغزوات بأسانيد متعددة', source: 'المغازي - الواقدي (207هـ)' },
+    { type: 'book', name: 'الرحيق المختوم', text: 'دراسة معاصرة موثقة للسيرة النبوية والغزوات، جائزة رابطة العالم الإسلامي', source: 'الرحيق المختوم - المباركفوري' }
+  ],
+  miracle: [
+    { type: 'hadith', name: 'انشقاق القمر', text: 'انشق القمر على عهد رسول الله ﷺ فلقتين، فقال النبي ﷺ: اشهدوا', source: 'صحيح البخاري (3637) ومسلم (2800)' },
+    { type: 'hadith', name: 'تكثير الطعام', text: 'كنا في غزوة فأصاب الناس مخمصة، فأمر النبي ﷺ بفضل أزواد القوم فجمعت...', source: 'صحيح البخاري (2484) ومسلم (1729)' },
+    { type: 'hadith', name: 'نبع الماء من أصابعه', text: 'حانت صلاة العصر فالتمس الناس الوضوء فلم يجدوا، فأُتي النبي ﷺ بوضوء فوضع يده في الإناء', source: 'صحيح البخاري (169) ومسلم (2279)' },
+    { type: 'hadith', name: 'حنين الجذع', text: 'كان النبي ﷺ يخطب إلى جذع نخلة، فلما اتخذ المنبر تحول إليه، فحن الجذع', source: 'صحيح البخاري (3585)' },
+    { type: 'hadith', name: 'الإسراء والمعراج', text: 'بينما أنا في الحطيم - وربما قال: في الحجر - مضطجعاً إذ أتاني آت فقد...', source: 'صحيح البخاري (3887) ومسلم (164)' },
+    { type: 'hadith', name: 'شكوى الجمل', text: 'دخل النبي ﷺ حائطاً لرجل من الأنصار فإذا فيه جمل، فلما رأى النبي ﷺ حن وذرفت عيناه', source: 'سنن أبي داود (2549) - صحيح' },
+    { type: 'book', name: 'دلائل النبوة - البيهقي', text: 'موسوعة كاملة لمعجزات النبي ﷺ ودلائل نبوته من المصادر الصحيحة', source: 'دلائل النبوة - البيهقي (458هـ)' },
+    { type: 'book', name: 'الشفا بتعريف حقوق المصطفى', text: 'في فضائل ومعجزات النبي ﷺ وحقوقه على الأمة', source: 'الشفا - القاضي عياض (544هـ)' },
+    { type: 'book', name: 'الخصائص الكبرى', text: 'في خصائص النبي ﷺ ومعجزاته وفضائله', source: 'الخصائص الكبرى - السيوطي (911هـ)' }
+  ]
+};
+
+// ===== HOOKS LIBRARY =====
+const HOOKS = {
+  nation: [
+    { hook: 'تخيّل... قوم كانوا أطول من النخل، وأقوى من الجبال، فأهلكهم الله بريح صرصر عاتية', story: 'قوم عاد' },
+    { hook: 'تخيّل... مدينة كاملة قلبها الله رأساً على عقب في ليلة واحدة', story: 'قوم لوط' },
+    { hook: 'تخيّل... قوماً نحتوا الجبال بيوتاً، فأخذتهم الصيحة فأصبحوا في ديارهم جاثمين', story: 'قوم ثمود' },
+    { hook: 'تخيّل... ملكاً جباراً ادّعى الألوهية، فأغرقه الله أمام قومه', story: 'فرعون' },
+    { hook: 'تخيّل... قارون الذي آتاه الله من الكنوز ما إن مفاتحه لتنوء بالعصبة أولي القوة', story: 'قارون' },
+    { hook: 'في يوم من الأيام... كان قوم اعتدوا في السبت، فجعلهم الله قردة خاسئين', story: 'أصحاب السبت' },
+    { hook: 'تخيّل... رجل ادّعى أنه إله، فماتت ذبابة في طعامه فلم يستطع إحياءها', story: 'النمرود' },
+    { hook: 'تخيّل... قرية ذُكرت في القرآن، أتاها جواسيس فقتلوا أحدهم، فأرسل الله عليهم ملكاً جباراً', story: 'أصحاب القرية' }
+  ],
+  prophet: [
+    { hook: 'تخيّل... رجل بنى سفينة في صحراء، فضحك منه قومه، ثم جاء الطوفان', story: 'نوح عليه السلام' },
+    { hook: 'تخيّل... طفلاً رضيعاً ألقته أمه في النيل بأمر الله، فتربى في قصر فرعون', story: 'موسى عليه السلام' },
+    { hook: 'تخيّل... رجلاً واحداً وقف ضد قومه كلهم في عبادة الأصنام... فأشعلوا له ناراً عظيمة', story: 'إبراهيم عليه السلام' },
+    { hook: 'تخيّل... طفلاً تكلم في المهد، وأحيا الموتى بإذن الله، ورُفع إلى السماء', story: 'عيسى عليه السلام' },
+    { hook: 'تخيّل... فتى ألقاه إخوته في بئر، فأصبح عزيز مصر', story: 'يوسف عليه السلام' },
+    { hook: 'تخيّل... نبياً ابتلاه الله في جسده وماله وأهله 18 سنة، فلم يقل إلا "إنا لله"', story: 'أيوب عليه السلام' },
+    { hook: 'تخيّل... نبياً ابتلعه الحوت في ظلمات البحر، فما أنجاه إلا تسبيحه لله', story: 'يونس عليه السلام' },
+    { hook: 'في يوم من الأيام... دخل ملكان على نبيٍّ يصلي، فاحتكما عنده... فبكى وتاب', story: 'داود عليه السلام' },
+    { hook: 'تخيّل... ملكاً سخّر الله له الجن والإنس والريح والطير', story: 'سليمان عليه السلام' },
+    { hook: 'تخيّل... شيخاً كبيراً يدعو ربه بصوت خفي أن يرزقه ولداً، فاستجاب الله', story: 'زكريا عليه السلام' }
+  ],
+  sign: [
+    { hook: 'تخيّل... رجلاً سيخرج آخر الزمان، يدّعي الألوهية، يمشي معه نهرٌ من ماء ونار', story: 'الدجال' },
+    { hook: 'تخيّل... دابة عجيبة تظهر في جزيرة مهجورة، تحدّث الناس بلغتهم وتخبرهم عن الدجال', story: 'الجساسة' },
+    { hook: 'تخيّل... أمتين عظيمتين سيخرجان آخر الزمان من وراء سد بناه ذو القرنين', story: 'يأجوج ومأجوج' },
+    { hook: 'تخيّل... رجلاً عادلاً يبسط الأرض قسطاً وعدلاً كما ملئت ظلماً وجوراً', story: 'المهدي' },
+    { hook: 'تخيّل... عيسى ابن مريم ينزل عند المنارة البيضاء، فيكسر الصليب ويقتل الخنزير', story: 'نزول عيسى' },
+    { hook: 'في يوم من الأيام... ستطلع الشمس من مغربها، فيغلق باب التوبة', story: 'طلوع الشمس من مغربها' },
+    { hook: 'تخيّل... دابة عجيبة تخرج من الأرض تكلّم الناس وتسم المؤمن والكافر', story: 'دابة الأرض' },
+    { hook: 'تخيّل... أن تلد الأمة ربتها، وأن ترى الحفاة العراة يتطاولون في البنيان', story: 'الساعات الصغرى' }
+  ],
+  companion: [
+    { hook: 'تخيّل... صاحباً كان معه في الغار، وصاحبه في الحياة، وخليفته بعد موته', story: 'أبو بكر الصديق' },
+    { hook: 'تخيّل... رجلاً قال عنه النبي ﷺ "لو كان بعدي نبي لكان عمر"', story: 'عمر بن الخطاب' },
+    { hook: 'تخيّل... صحابياً جهز جيش العسرة، فاشترى بئر رومة، وكان يستحي منه الملائكة', story: 'عثمان بن عفان' },
+    { hook: 'تخيّل... فتىً نشأ في بيت النبي ﷺ، أعطاه راية يوم خيبر فقال "هذا يحبه الله ورسوله"', story: 'علي بن أبي طالب' },
+    { hook: 'تخيّل... فاتح بيت المقدس، الذي قال عنه عمر "ما رأيت رجلاً أقوى من أبي عبيدة"', story: 'أبو عبيدة بن الجراح' },
+    { hook: 'تخيّل... مولىً كان عبداً فأصبح شاهراً سيفه في غزوة بدر يفلق هام المشركين', story: 'بلال بن رباح' },
+    { hook: 'في يوم من الأيام... كان فتى يستهزئ بالقرآن، فدخل بيت أخته فسمع الآية فأسلم', story: 'إسلام عمر' },
+    { hook: 'تخيّل... صحابياً قال عنه النبي ﷺ "ما طلعت الشمس على رجل أحفظ مني للحديث"', story: 'أبو هريرة' }
+  ],
+  battle: [
+    { hook: 'تخيّل... 313 رجلاً في مواجهة 1000 من قريش... وانتصر الإسلام للأبد', story: 'غزوة بدر' },
+    { hook: 'تخيّل... النبي ﷺ يُكسر سنه، ويُجرح وجهه، ويسقط في الحفرة', story: 'غزوة أحد' },
+    { hook: 'تخيّل... 3000 صحابي يحفرون خندقاً حول المدينة لمنع جيش 10000 من المشركين', story: 'غزوة الخندق' },
+    { hook: 'تخيّل... 1400 صحابي خرجوا للعمرة، فعادوا بفتح مكة', story: 'صلح الحديبية' },
+    { hook: 'تخيّل... النبي ﷺ يدخل مكة منكس الرأس تواضعاً، بعد 21 سنة من البعثة', story: 'فتح مكة' },
+    { hook: 'تخيّل... خالد بن الوليد يقاتل 9 معارك دون أن يفقد سيفاً يدمى أو ينكسر', story: 'سيف الله المسلول' },
+    { hook: 'في يوم من الأيام... كاد المسلمون أن ينهزموا في حنين، فثبت النبي ﷺ ينادي "أنا النبي لا كذب"', story: 'غزوة حنين' }
+  ],
+  miracle: [
+    { hook: 'تخيّل... القمر ينشق إلى نصفين في السماء، ثم يلتئم، أمام قريش في مكة', story: 'انشقاق القمر' },
+    { hook: 'تخيّل... ماء ينبع من بين أصابع النبي ﷺ، فيشرب منه الجيش كله', story: 'نبع الماء من أصابعه' },
+    { hook: 'تخيّل... طعاماً قليلاً يأكل منه 80 رجلاً ويفضل أوعية', story: 'تكثير الطعام' },
+    { hook: 'تخيّل... جذع نخلة يبكي حنيناً للنبي ﷺ بعدما تركه إلى المنبر', story: 'حنين الجذع' },
+    { hook: 'تخيّل... جملاً يشكو لرسول الله ﷺ من ظلم صاحبه، فيستجيب له النبي', story: 'شكوى الجمل' },
+    { hook: 'في ليلة... أُسري بالنبي ﷺ من المسجد الحرام إلى المسجد الأقصى ثم إلى السماوات السبع', story: 'الإسراء والمعراج' }
+  ]
+};
+
+// ===== UTILITY FUNCTIONS =====
+function showSaved() {
+  const el = document.getElementById('save-indicator');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function getEl(id) { return document.getElementById(id); }
+function val(id) { const e = getEl(id); return e ? e.value.trim() : ''; }
+function setVal(id, v) { const e = getEl(id); if (e) e.value = v; }
+
+function secondsToTime(s) {
+  return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
+function timeToSeconds(t) {
+  const p = t.split(':');
+  return (parseInt(p[0])||0)*60 + (parseInt(p[1])||0);
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showSaved());
+}
+
+// ===== MODE SWITCHING =====
+function switchMode(btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const mode = btn.dataset.mode;
+  ['create', 'analyze', 'thumbnail', 'shorts', 'dashboard', 'calendar', 'quality'].forEach(m => {
+    const el = getEl(m + '-mode');
+    if (el) el.classList.toggle('hidden', m !== mode);
+  });
+  if (mode === 'dashboard') renderDashboard();
+}
+
+function togglePanel(id) {
+  const el = getEl(id);
+  el.classList.toggle('open');
+  if (id === 'history-panel' && el.classList.contains('open')) loadHistory();
+  if (id === 'refs-panel' && el.classList.contains('open')) filterRefs(document.querySelector('[data-refcat="all"]'));
+  if (id === 'hooks-panel' && el.classList.contains('open')) filterHooks(document.querySelector('[data-hookcat="all"]'));
+}
+
+function toggleEpisodeFields() {
+  const ep = val('ep-num');
+  getEl('series-links-section').classList.toggle('hidden', ep === 'single');
+  getEl('related-eps-section').classList.toggle('hidden', ep !== 'single');
+  checkSensitivity();
+}
+
+function togglePlatform(el) { el.classList.toggle('selected'); }
+
+// ===== SETTINGS =====
+function saveSettings() {
+  const s = {};
+  ['channel','prophets','signs','nations','companions','battles','insta','fb','tiktok','twitter','telegram','whatsapp'].forEach(k => {
+    s[k] = val('set-' + k);
+  });
+  try { localStorage.setItem(STORAGE.settings, JSON.stringify(s)); showSaved(); }
+  catch(e) { alert('فشل الحفظ: ' + e.message); }
+}
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE.settings);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    Object.keys(s).forEach(k => setVal('set-' + k, s[k] || ''));
+  } catch(e) {}
+}
+
+function getSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE.settings);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+
+// ===== REFS PANEL =====
+function filterRefs(btn) {
+  document.querySelectorAll('[data-refcat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cat = btn.dataset.refcat;
+  let list = [];
+  if (cat === 'all') Object.values(REFS).forEach(arr => list.push(...arr));
+  else list = REFS[cat] || [];
+  const html = list.map(r => {
+    const typeName = r.type === 'quran' ? 'قرآن' : r.type === 'hadith' ? 'حديث' : r.type === 'tafsir' ? 'تفسير' : 'كتاب';
+    return `<div class="lib-card" onclick='copyText(${JSON.stringify(r.text + " (" + r.source + ")")})'>
+      <div class="lib-meta"><strong style="color:#633806;">${r.name}</strong> <span class="ref-type-badge ref-${r.type}">${typeName}</span></div>
+      <div class="lib-text" style="margin-bottom:4px;">${r.text.substring(0, 120)}${r.text.length > 120 ? '...' : ''}</div>
+      <div style="font-size:11px;color:#BA7517;">📚 ${r.source}</div>
+    </div>`;
+  }).join('');
+  getEl('refs-list').innerHTML = html || '<p class="text-muted">لا توجد مراجع.</p>';
+}
+
+// ===== HOOKS PANEL =====
+function filterHooks(btn) {
+  document.querySelectorAll('[data-hookcat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cat = btn.dataset.hookcat;
+  let list = [];
+  if (cat === 'all') Object.values(HOOKS).forEach(arr => list.push(...arr));
+  else list = HOOKS[cat] || [];
+  const html = list.map(h => `<div class="lib-card" onclick='useHook(${JSON.stringify(h.hook)})'>
+    <div class="lib-meta">${h.story}</div>
+    <div class="lib-text">${h.hook}</div>
+  </div>`).join('');
+  getEl('hooks-list').innerHTML = html;
+}
+
+function randomHook() {
+  const all = [];
+  Object.values(HOOKS).forEach(arr => all.push(...arr));
+  const r = all[Math.floor(Math.random() * all.length)];
+  setVal('hook-line', r.hook);
+  getEl('hooks-panel').classList.remove('open');
+  alert('✓ تم اختيار هوك من "' + r.story + '"');
+}
+
+function useHook(h) {
+  setVal('hook-line', h);
+  getEl('hooks-panel').classList.remove('open');
+  showSaved();
+}
+
+// ===== EPISODES (related & channel) =====
+function addRelated() {
+  const n = val('related-name'); const l = val('related-link');
+  if (!n) return;
+  relatedEps.push({ name: n, link: l });
+  setVal('related-name', ''); setVal('related-link', '');
+  renderRelated();
+}
+function removeRelated(i) { relatedEps.splice(i, 1); renderRelated(); }
+function renderRelated() {
+  getEl('related-list').innerHTML = relatedEps.map((r, i) =>
+    `<div class="ep-item">🔗 <strong>${r.name}</strong><span class="url">${r.link || ''}</span><button class="btn-danger btn-small" onclick="removeRelated(${i})">✕</button></div>`
+  ).join('');
+}
+
+function addChannel() {
+  const n = val('channel-name'); const l = val('channel-link');
+  if (!n) return;
+  channelEps.push({ name: n, link: l });
+  setVal('channel-name', ''); setVal('channel-link', '');
+  renderChannelEps();
+}
+function removeChannel(i) { channelEps.splice(i, 1); renderChannelEps(); }
+function renderChannelEps() {
+  getEl('channel-list').innerHTML = channelEps.map((r, i) =>
+    `<div class="ep-item">📺 <strong>${r.name}</strong><span class="url">${r.link || ''}</span><button class="btn-danger btn-small" onclick="removeChannel(${i})">✕</button></div>`
+  ).join('');
+}
+
+// ===== CHAPTERS =====
+function addChapter() {
+  const last = chapters.length > 0 ? chapters[chapters.length-1].seconds + 120 : 0;
+  chapters.push({ time: secondsToTime(last), seconds: last, title: 'فصل جديد' });
+  renderChapters();
+}
+function removeChapter(i) { chapters.splice(i, 1); renderChapters(); }
+function updateChapter(i, field, value) {
+  if (field === 'time') { chapters[i].time = value; chapters[i].seconds = timeToSeconds(value); }
+  else chapters[i].title = value;
+}
+function moveChapter(i, dir) {
+  if (i + dir < 0 || i + dir >= chapters.length) return;
+  [chapters[i], chapters[i+dir]] = [chapters[i+dir], chapters[i]];
+  const t = chapters[i].seconds; chapters[i].seconds = chapters[i+dir].seconds; chapters[i+dir].seconds = t;
+  chapters.sort((a,b) => a.seconds - b.seconds);
+  chapters.forEach(c => c.time = secondsToTime(c.seconds));
+  renderChapters();
+}
+function getEffectiveDuration() {
+  // أولوية للمدة الفعلية المكتوبة يدوياً
+  const rd = val('real-duration');
+  if (rd && rd.includes(':')) {
+    const sec = timeToSeconds(rd);
+    if (sec > 0) return sec;
+  } else if (rd && !isNaN(parseInt(rd))) {
+    // لو كتب رقم بس (دقائق)
+    return parseInt(rd) * 60;
+  }
+  // وإلا المدة المحسوبة من النص
+  if (lastScriptDuration > 0) return lastScriptDuration;
+  // وإلا آخر فصل + هامش
+  return chapters.length > 0 ? (chapters[chapters.length-1].seconds + 90) : 600;
+}
+
+function onRealDurationChange() {
+  // تحديث الملخص فقط عند تغيير المدة
+  if (chapters.length > 0) {
+    const tot = getEffectiveDuration();
+    getEl('chapters-summary').innerHTML = `${chapters.length} فصل · المدة ${secondsToTime(tot)} · اضغط "توزيع تلقائي" لإعادة الترتيب`;
+  }
+}
+
+function redistributeChapters() {
+  if (chapters.length === 0) { alert('لا توجد فصول لتوزيعها. أضف فصولاً أو حلّل النص أولاً.'); return; }
+  const total = getEffectiveDuration();
+  const n = chapters.length;
+  // توزيع: الفصل الأول من 0، والباقي موزّع بانتظام حتى ~92% من المدة (نترك خاتمة)
+  chapters.forEach((c, i) => {
+    let sec;
+    if (i === 0) sec = 0;
+    else sec = Math.round((i / n) * total);
+    c.seconds = sec;
+    c.time = secondsToTime(sec);
+  });
+  renderChapters();
+  showSaved();
+}
+function renderChapters() {
+  const el = getEl('chapters-list');
+  if (chapters.length === 0) {
+    el.innerHTML = '<div class="alert alert-info">لا توجد فصول. ارفع نص الحلقة + اضغط "تحليل ذكي" أو أضف فصل يدوياً.</div>';
+    getEl('chapters-summary').innerHTML = '';
+    return;
+  }
+  el.innerHTML = chapters.map((c, i) => `
+    <div class="chapter-row">
+      <input type="text" class="time" value="${c.time}" oninput="updateChapter(${i},'time',this.value)">
+      <input type="text" value="${c.title}" oninput="updateChapter(${i},'title',this.value)">
+      <button class="btn-icon btn-small" onclick="moveChapter(${i},-1)" ${i===0?'disabled':''}>↑</button>
+      <button class="btn-danger btn-small" onclick="removeChapter(${i})">✕</button>
+    </div>
+  `).join('');
+  const tot = getEffectiveDuration();
+  getEl('chapters-summary').innerHTML = `${chapters.length} فصل · المدة ${secondsToTime(tot)}`;
+}
+
+// ===== SMART ANALYZER =====
+function handleFileUpload(event, targetId, infoId) {
+  const file = event.target.files[0]; if (!file) return;
+  const fi = getEl(infoId); fi.style.display = 'block';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    setVal(targetId, e.target.result);
+    fi.innerHTML = `✓ ${file.name} - ${e.target.result.length} حرف`;
+  };
+  reader.readAsText(file);
+}
+
+function smartAnalyzeScript() {
+  const text = val('script-text');
+  if (!text) { alert('الصق نص الحلقة أولاً'); return; }
+  const wc = text.split(/\s+/).filter(w => w.length > 1).length;
+
+  // المدة: أولوية للمدة الفعلية المكتوبة، وإلا حساب تلقائي بسرعة أثر (~105 كلمة/دقيقة - راوي درامي بطيء مع وقفات)
+  const realDur = val('real-duration');
+  let durSec;
+  let durSource;
+  if (realDur && (realDur.includes(':') || !isNaN(parseInt(realDur)))) {
+    durSec = realDur.includes(':') ? timeToSeconds(realDur) : parseInt(realDur) * 60;
+    durSource = 'يدوي';
+  } else {
+    durSec = Math.round((wc / 105) * 60); // سرعة أثر الدرامية البطيئة
+    durSource = 'تقديري';
+  }
+  const dur = durSec / 60;
+  lastScriptDuration = durSec;
+
+  const qr = analyzeQuality(text, wc);
+  renderQualityReport(qr);
+
+  // عدد الفصول حسب المدة الفعلية
+  let tc;
+  if (dur < 4) tc = 3; else if (dur < 7) tc = 4; else if (dur < 11) tc = 5; else if (dur < 16) tc = 7; else tc = 9;
+
+  const hookR = extractHook(text);
+  if (hookR.hook && !val('hook-line')) setVal('hook-line', hookR.hook);
+  chapters = extractChapters(text, tc, dur);
+  renderChapters();
+  const fi = getEl('file-info'); fi.style.display = 'block';
+  fi.innerHTML = `✓ تحليل اكتمل: ${wc} كلمة · المدة ${secondsToTime(durSec)} (${durSource}) · ${chapters.length} فصل ${hookR.hook ? '· هوك (' + hookR.method + ')' : '· لم يُكتشف هوك تلقائي'}`;
+}
+
+function extractHook(text) {
+  const patterns = [
+    { name: 'تخيّل', r: /تخيّل[^\.!\?\n]{20,250}[\.!\?]/ },
+    { name: 'تخيل', r: /تخيل[^\.!\?\n]{20,250}[\.!\?]/ },
+    { name: 'يحكى أن', r: /يحكى أن[^\.!\?\n]{20,250}/ },
+    { name: 'في يوم', r: /في يوم من الأيام[^\.!\?\n]{20,250}/ },
+    { name: 'كان هناك', r: /كان هناك[^\.!\?\n]{20,250}/ },
+    { name: 'حدث في', r: /حدث في[^\.!\?\n]{20,250}/ },
+    { name: 'أعظم', r: /(?:^|[\.\n])\s*أعظم[^\.!\?\n]{20,250}/ },
+    { name: 'كانت', r: /(?:^|[\.\n])\s*كانت[^\.!\?\n]{30,250}\.{2,3}/ }
+  ];
+  for (const p of patterns) {
+    const m = text.match(p.r);
+    if (m) { const c = m[0].trim().replace(/^[\.\n\s]+/, ''); if (c.length >= 30) return { hook: c, method: p.name }; }
+  }
+  const lines = text.split(/\n+/).filter(l => l.trim().length > 30);
+  for (const l of lines) {
+    const c = l.trim();
+    if (c.length >= 60 && c.length <= 280 && !c.startsWith('#')) return { hook: c, method: 'جملة قوية' };
+  }
+  return { hook: '', method: '' };
+}
+
+function analyzeQuality(text, wc) {
+  const r = { score: 0, issues: [], wins: [], suggestions: [] };
+  if (wc < 300) r.issues.push({ s: 'high', m: `نص قصير جداً (${wc} كلمة)` });
+  else if (wc >= 1500) { r.wins.push(`طول ممتاز (${wc})`); r.score += 25; }
+  else { r.wins.push(`طول جيد (${wc})`); r.score += 15; }
+  const trans = ['ولكن في','وفي يوم','وفي ليلة','ثم جاء','ثم نزل','ولمّا','فلما','حتى إذا','ولكن الله','فأرسل','فنادى'];
+  let tc = 0; trans.forEach(t => { if (text.includes(t)) tc++; });
+  if (tc >= 5) { r.wins.push(`${tc} انتقالات درامية ممتازة`); r.score += 25; }
+  else if (tc < 3) r.issues.push({ s: 'medium', m: 'انتقالات قليلة - أضف "ولكن في يوم"، "ثم نزل"...' });
+  else r.score += 12;
+  if (text.includes('﴿') || text.match(/قال الله/)) { r.wins.push('يحتوي آيات قرآنية'); r.score += 20; }
+  else r.suggestions.push('أضف آيات قرآنية بـ ﴿ ﴾');
+  if (text.match(/قال [^:]*:/)) { r.wins.push('يحتوي حوار/حديث'); r.score += 15; }
+  else r.suggestions.push('أضف حواراً نبوياً (يرفع watch time)');
+  const opening = text.substring(0, 250);
+  if (['تخيّل','تخيل','يحكى','في يوم','كان هناك'].some(s => opening.includes(s))) { r.wins.push('افتتاحية قوية'); r.score += 15; }
+  else r.issues.push({ s: 'medium', m: 'افتتاحية ضعيفة - ابدأ بـ "تخيّل..." أو "في يوم..."' });
+  r.score = Math.min(100, r.score);
+  return r;
+}
+
+function renderQualityReport(r) {
+  const el = getEl('quality-report');
+  const color = r.score >= 70 ? '#27500a' : r.score >= 40 ? '#BA7517' : '#a32d2d';
+  const grade = r.score >= 80 ? 'ممتاز' : r.score >= 60 ? 'جيد جداً' : r.score >= 40 ? 'جيد' : 'يحتاج تحسين';
+  let h = `<div style="background:#fff;border:1px solid #e5e0d3;border-radius:8px;padding:12px;margin:10px 0;">
+    <p style="font-weight:600;margin-bottom:6px;">📊 جودة النص: <span style="color:${color};">${grade} (${r.score}/100)</span></p>
+    <div class="quality-bar"><div class="quality-fill" style="width:${r.score}%;background:${color};"></div></div>`;
+  if (r.wins.length) h += `<div style="margin-top:10px;">${r.wins.map(w => `<div style="font-size:12px;padding:4px 8px;background:#eaf3de;color:#27500a;border-radius:6px;margin-bottom:3px;">✓ ${w}</div>`).join('')}</div>`;
+  if (r.issues.length) h += `<div style="margin-top:6px;">${r.issues.map(i => `<div style="font-size:12px;padding:4px 8px;background:${i.s==='high'?'#fcebeb':'#faeeda'};color:${i.s==='high'?'#791f1f':'#633806'};border-radius:6px;margin-bottom:3px;">⚠ ${i.m}</div>`).join('')}</div>`;
+  if (r.suggestions.length) h += `<div style="margin-top:6px;"><p style="font-size:12px;color:#888;margin-bottom:4px;">💡 اقتراحات:</p>${r.suggestions.map(s => `<div style="font-size:12px;padding:4px 8px;background:#e6f1fb;color:#0c447c;border-radius:6px;margin-bottom:3px;">• ${s}</div>`).join('')}</div>`;
+  h += `</div>`;
+  el.innerHTML = h;
+}
+
+function extractChapters(text, tc, durMin) {
+  const ets = text.match(/^\s*\d{1,2}[:：]\d{2}\s+.+$/gm);
+  if (ets && ets.length >= 3) return ets.map(l => {
+    const m = l.trim().match(/^(\d{1,2})[:：](\d{2})\s+(.+)$/);
+    if (m) { const s = parseInt(m[1])*60 + parseInt(m[2]); return { time: String(parseInt(m[1])).padStart(2,'0') + ':' + m[2], seconds: s, title: m[3].trim() }; }
+    return null;
+  }).filter(Boolean);
+  const transitions = [
+    { p: 'ولكن في', w: 3 }, { p: 'وفي يوم', w: 3 }, { p: 'وفي ليلة', w: 3 },
+    { p: 'ثم جاء', w: 2 }, { p: 'ثم نزل', w: 3 }, { p: 'وأخيراً', w: 3 },
+    { p: 'ولكن الله', w: 3 }, { p: 'فلما', w: 2 }, { p: 'حتى إذا', w: 3 },
+    { p: 'مرت السنوات', w: 3 }, { p: 'وفي ذلك اليوم', w: 3 }
+  ];
+  const tps = [];
+  for (const t of transitions) {
+    let idx = 0;
+    while ((idx = text.indexOf(t.p, idx)) !== -1) { tps.push({ pos: idx, weight: t.w }); idx += t.p.length; }
+  }
+  tps.sort((a,b) => a.pos - b.pos);
+  const total = text.length, step = total / tc;
+  const sel = [{ pos: 0 }];
+  for (let i = 1; i < tc; i++) {
+    const tgt = step * i, minD = step * 0.4, last = sel[sel.length-1].pos;
+    let best = null, bestS = Infinity;
+    for (const tp of tps) {
+      if (tp.pos < last + minD) continue;
+      const d = Math.abs(tp.pos - tgt), sc = d - (tp.weight * 50);
+      if (sc < bestS) { bestS = sc; best = tp; }
+    }
+    if (best) sel.push(best); else sel.push({ pos: Math.floor(tgt) });
+  }
+  return sel.map((s, i) => {
+    const sec = Math.floor((s.pos / total) * durMin * 60);
+    return { time: secondsToTime(sec), seconds: sec, title: extractTitle(text, s.pos, i === 0) };
+  });
+}
+
+function extractTitle(text, pos, isFirst) {
+  if (isFirst) { const ph = extractKeyPhrases(text.substring(0, 300)); return ph[0] || 'البداية'; }
+  const seg = text.substring(pos, Math.min(pos + 400, text.length));
+  const ph = extractKeyPhrases(seg);
+  if (ph[0]) return ph[0];
+  const first = seg.split(/[\.!\?\n]/)[0].trim();
+  const ws = first.split(/\s+/).filter(w => w.length > 2).slice(0, 5);
+  let t = ws.join(' ');
+  if (t.length > 50) t = t.substring(0, 47) + '...';
+  if (t.length < 8) t = 'فصل جديد';
+  return t;
+}
+
+function extractKeyPhrases(text) {
+  const phrases = [];
+  const eventP = [/(?:إرسال|ميلاد|موت|قتل|نزول|خروج|ظهور|بدء|نهاية|هلاك|عذاب|دعوة)\s+([^\.,،\n]{5,40})/, /(?:بعث الله|أرسل الله|أنزل الله)\s+([^\.,،\n]{5,40})/];
+  for (const p of eventP) {
+    const m = text.match(p);
+    if (m && m[0]) {
+      const c = m[0].replace(/[\.,،\n].*$/, '').trim();
+      if (c.length >= 8 && c.length <= 50) phrases.push(c);
+    }
+    if (phrases.length >= 3) break;
+  }
+  const keyE = [
+    { k: 'العذاب', t: 'نزول العذاب' }, { k: 'ريح صرصر', t: 'ريح صرصر عاتية' },
+    { k: 'الصيحة', t: 'الصيحة المهلكة' }, { k: 'الطوفان', t: 'الطوفان العظيم' },
+    { k: 'الناقة', t: 'ناقة الله' }, { k: 'الدعوة', t: 'دعوة إلى الله' },
+    { k: 'التكذيب', t: 'تكذيب الرسول' }, { k: 'الجنة', t: 'وعد الجنة' },
+    { k: 'النار', t: 'وعيد النار' }
+  ];
+  for (const e of keyE) if (text.includes(e.k) && !phrases.some(p => p.includes(e.k))) { phrases.push(e.t); if (phrases.length >= 5) break; }
+  return phrases;
+}
+
+// ===== SENSITIVITY CHECK =====
+function checkSensitivity() {
+  const s = val('story-name').toLowerCase();
+  const el = getEl('sensitivity-alert');
+  const topics = [
+    { kw: ['معاوية','علي','صفين','الجمل','الفتنة الكبرى'], m: 'موضوع حساس: خلافات بين الصحابة. التزم بمنهج أهل السنة الوسطي.' },
+    { kw: ['عثمان','فتنة عثمان'], m: 'حساس: مقتل عثمان. ركز على فضائله.' },
+    { kw: ['شيعة','مذهب'], m: 'موضوع مذهبي.' }
+  ];
+  let w = null;
+  for (const t of topics) { if (t.kw.some(k => s.includes(k))) { w = t.m; break; } }
+  el.innerHTML = w ? `<div class="alert alert-warn">⚠️ ${w}</div>` : '';
+}
+
+// ===== TITLE LENGTH METER =====
+function updateTitleMeter(srcId, targetId) {
+  const len = val(srcId).length;
+  const cls = len <= 65 ? 'lm-good' : len <= 70 ? 'lm-warn' : 'lm-bad';
+  const icon = len <= 65 ? '✓' : len <= 70 ? '⚠' : '✗';
+  getEl(targetId).innerHTML = `<span class="length-meter ${cls}">${len}/65 ${icon}</span>`;
+}
+
+// ===== ACH BUILDERS =====
+function buildTitles(d) {
+  const { story, type, epNum } = d;
+  const ep = epNum === '1' ? ' (الجزء الأول)' : epNum === '2' ? ' (الجزء الثاني)' : epNum === '3' ? ' (الجزء الثالث والأخير)' : '';
+  const f = {
+    nation: { c: `أعظم قوم سكنوا الأرض !! | قصة ${story} وكأنك معهم | أثر${ep}`, b: `قصة لازم تعرفها قبل ما تموت !! | ${story} | أثر${ep}`, k: `القصة الكاملة لـ${story} | من العظمة إلى العذاب | أثر${ep}` },
+    prophet: { c: `قصة سيدنا ${story} كاملة !! | من القرآن والسنة | أثر${ep}`, b: `ما لم تسمعه عن ${story} !! | حقائق من القرآن | أثر${ep}`, k: `أعظم رجل عرفه التاريخ | قصة ${story} | أثر${ep}` },
+    sign: { c: `متى تظهر ؟! | ${story} - علامة من الساعة | أثر${ep}`, b: `قصة لازم تعرفها قبل القيامة !! | ${story} | أثر${ep}`, k: `أخبر بها النبي ﷺ قبل 1400 سنة !! | ${story} | أثر${ep}` },
+    companion: { c: `الصحابي الذي قال عنه النبي ﷺ !! | ${story} | أثر${ep}`, b: `قصة صحابي تغيّر حياتك !! | ${story} | أثر${ep}`, k: `أعظم صحابة رسول الله ﷺ | ${story} | أثر${ep}` },
+    battle: { c: `أشرس مواجهة في حياة النبي ﷺ !! | ${story} | أثر${ep}`, b: `يوم اشتعلت الأرض حرباً !! | ${story} | أثر${ep}`, k: `القصة الكاملة لـ${story} | أثر${ep}` },
+    miracle: { c: `معجزة حيّرت العقول !! | ${story} | أثر${ep}`, b: `ما لم تسمعه عن ${story} | أثر${ep}`, k: `القصة الكاملة لمعجزة ${story} | أثر${ep}` },
+    general: { c: `قصة ${story} كاملة !! | بأسلوب سينمائي | أثر${ep}`, b: `ما لم تسمعه عن ${story} !! | أثر${ep}`, k: `القصة الكاملة لـ${story} | أثر${ep}` }
+  };
+  const s = f[type] || f.general;
+  return [
+    { tag: 'classic', label: 'كلاسيكي', text: s.c, length: s.c.length },
+    { tag: 'bold', label: 'جريء', text: s.b, length: s.b.length },
+    { tag: 'keyword', label: 'بحث', text: s.k, length: s.k.length }
+  ];
+}
+
+function buildHooks(d) {
+  const b = d.hook || `قصة ${d.story} الكاملة`;
+  return [
+    { tag: 'classic', label: 'كلاسيكي', text: `${b}\n\nقصة ${d.story} بالتفاصيل وكأنك معهم — من المصادر الإسلامية الموثقة 🌙` },
+    { tag: 'bold', label: 'صادم', text: `${b}\nليست مجرد قصة... بل حقيقة قرآنية !!\n\nقصة ${d.story} كاملة 🌙` },
+    { tag: 'keyword', label: 'بحث', text: `${b}\n\nالقصة الكاملة لـ${d.story} من القرآن والسنة | بأسلوب سينمائي 🌙` }
+  ];
+}
+
+function buildDescription(d, h, s) {
+  const { story, type, currentLink, prevLink, nextLink, epNum } = d;
+  const ts = chapters.map(c => `${c.time} ${c.title}`).join('\n');
+  const tsB = ts ? `\n━━━━━━━━━━━━━━━━━━━━━━━\n⏰ فصول الحلقة:\n${ts}\n` : '';
+  let nav = '';
+  if (epNum === 'single' && relatedEps.length > 0) {
+    nav = '\n━━━━━━━━━━━━━━━━━━━━━━━\n🎬 حلقات ذات صلة:\n';
+    relatedEps.forEach(r => { nav += `▶ ${r.name}: ${r.link || '(القناة)'}\n`; });
+  } else if (prevLink || nextLink || currentLink) {
+    nav = '\n━━━━━━━━━━━━━━━━━━━━━━━\n🎬 السلسلة الكاملة:\n';
+    if (prevLink) nav += `▶ السابقة: ${prevLink}\n`;
+    if (currentLink) nav += `▶ الحالية: ${currentLink}\n`;
+    if (nextLink) nav += `▶ التالية: ${nextLink}\n`;
+  }
+  let cb = '';
+  if (channelEps.length > 0) {
+    cb = '\n━━━━━━━━━━━━━━━━━━━━━━━\n📺 حلقات أخرى:\n';
+    channelEps.forEach(c => { cb += `▶ ${c.name}: ${c.link || '(القناة)'}\n`; });
+  }
+  const srcMap = {
+    nation: '• القرآن الكريم\n• تفسير ابن كثير (774هـ)\n• تفسير الطبري (310هـ)\n• تفسير القرطبي (671هـ)\n• البداية والنهاية - ابن كثير\n• تاريخ الطبري',
+    prophet: '• القرآن الكريم\n• صحيح البخاري (256هـ)\n• صحيح مسلم (261هـ)\n• تفسير ابن كثير\n• قصص الأنبياء - ابن كثير',
+    sign: '• القرآن الكريم\n• صحيح البخاري ومسلم\n• سنن أبي داود (275هـ)\n• جامع الترمذي (279هـ)\n• النهاية في الفتن - ابن كثير',
+    companion: '• القرآن الكريم\n• صحيح البخاري ومسلم\n• سير أعلام النبلاء - الذهبي (748هـ)\n• الإصابة - ابن حجر (852هـ)',
+    battle: '• القرآن الكريم\n• كتب المغازي\n• السيرة النبوية - ابن هشام (218هـ)\n• زاد المعاد - ابن القيم (751هـ)\n• الرحيق المختوم',
+    miracle: '• القرآن الكريم\n• صحيح البخاري ومسلم\n• دلائل النبوة - البيهقي (458هـ)\n• الشفا - القاضي عياض (544هـ)',
+    general: '• القرآن الكريم\n• صحيح البخاري ومسلم\n• تفسير ابن كثير\n• البداية والنهاية - ابن كثير'
+  };
+  const ch = s.channel || '[القناة]';
+  return `${h}
+
+في هذه الحلقة من قناة أثر، نأخذكم في رحلة سينمائية موثقة لقصة ${story} بأسلوب الهكواتي السينمائي.
+
+🎬 ما الذي ستراه؟
+✦ القصة كاملة بتسلسل درامي
+✦ المصادر الإسلامية الموثقة من علماء أهل السنة
+✦ الدروس والعِبر المستفادة
+✦ بصرية سينمائية بأسلوب أنيمي
+${tsB}
+━━━━━━━━━━━━━━━━━━━━━━━
+📿 إذا أعجبتك الحلقة:
+👍 لايك | 🔔 اشترك وفعّل الجرس | 💬 علّق | 📤 شارك
+${nav}${cb}
+━━━━━━━━━━━━━━━━━━━━━━━
+🎬 قوائم التشغيل:
+• قصص الأنبياء: ${s.prophets || '[قائمة]'}
+• علامات الساعة: ${s.signs || '[قائمة]'}
+• الأمم البائدة: ${s.nations || '[قائمة]'}
+• الصحابة: ${s.companions || '[قائمة]'}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+📱 باقي المنصات:
+• Instagram: ${s.insta || '[الرابط]'}
+• Facebook: ${s.fb || '[الرابط]'}
+• TikTok: ${s.tiktok || '[الرابط]'}
+• Twitter/X: ${s.twitter || '[الرابط]'}
+• Telegram: ${s.telegram || '[الرابط]'}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+📚 المصادر (علماء موثوقون):
+${srcMap[type] || srcMap.general}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ تنبيه: المحتوى البصري تمثيل فني بأسلوب أنيمي سينمائي مولّد بالذكاء الاصطناعي. الأنبياء والصحابة لا تظهر وجوههم.
+
+━━━━━━━━━━━━━━━━━━━━━━━
+#أثر #قصص_إسلامية #${story.replace(/\s+/g,'_')} #قصص_القرآن #تاريخ_إسلامي`;
+}
+
+function buildTagPyramid(d) {
+  const t2 = {
+    nation: [`من هم ${d.story}`, `عذاب ${d.story}`, `هلاك ${d.story}`, 'الأمم البائدة', 'عذاب الأمم'],
+    prophet: [`سيدنا ${d.story}`, `معجزات ${d.story}`, `قوم ${d.story}`, 'قصص الأنبياء', 'أنبياء الله'],
+    sign: ['علامات الساعة الكبرى', 'أشراط الساعة', 'قبل القيامة', 'آخر الزمان', `خروج ${d.story}`],
+    companion: ['الصحابة الكرام', 'سير الصحابة', 'السيرة النبوية', `الصحابي ${d.story}`, 'فضائل الصحابة'],
+    battle: ['السيرة النبوية', 'مغازي النبي', 'غزوات الرسول', 'الفتوحات الإسلامية', `معركة ${d.story}`],
+    miracle: ['معجزات الأنبياء', 'معجزات القرآن', 'دلائل النبوة', 'آيات الله'],
+    general: ['قصص من القرآن', 'حكايات إسلامية', 'تاريخ إسلامي']
+  };
+  return {
+    tier1: { label: 'طبقة 1: أساسية', tags: [d.story, `قصة ${d.story}`, `${d.story} كاملة`, `${d.story} في القرآن`] },
+    tier2: { label: 'طبقة 2: Long-tail', tags: t2[d.type] || t2.general },
+    tier3: { label: 'طبقة 3: القناة', tags: ['قناة أثر', 'أثر', 'قصص إسلامية'] },
+    tier4: { label: 'طبقة 4: الجمهور', tags: ['قصص القرآن', 'الإسلام', 'وثائقيات إسلامية'] }
+  };
+}
+function flattenPyramid(p) {
+  return [...p.tier1.tags.slice(0,3), ...p.tier2.tags.slice(0,5), ...p.tier3.tags, ...p.tier4.tags.slice(0,3)].slice(0,15);
+}
+
+function buildHashtags(d) {
+  const s = d.story.replace(/\s+/g, '_');
+  const th = {
+    nation: ['#الأمم_البائدة', '#قوم_القرآن', '#عذاب_الأمم'],
+    prophet: ['#قصص_الأنبياء', '#أنبياء_الله'],
+    sign: ['#علامات_الساعة', '#قبل_القيامة', '#آخر_الزمان'],
+    companion: ['#الصحابة_الكرام', '#السيرة_النبوية'],
+    battle: ['#غزوات_الرسول', '#السيرة_النبوية'],
+    miracle: ['#معجزات_الأنبياء', '#معجزات_القرآن'],
+    general: ['#قصص_إسلامية', '#تاريخ_إسلامي']
+  }[d.type] || ['#قصص_إسلامية'];
+  return {
+    youtube: ['#أثر', '#قصص_إسلامية', `#${s}`, ...th.slice(0,2)].slice(0,5),
+    instagram: ['#أثر', '#قصص_إسلامية', `#${s}`, '#قصص_القرآن', ...th, '#اسلاميات', '#قصص_الانبياء', '#تاريخ_اسلامي', '#دعوة', '#ايمان', '#قران', '#islam', '#muslim', '#quran'],
+    facebook: ['#أثر', '#قصص_إسلامية', `#${s}`, ...th.slice(0,2)],
+    tiktok: ['#أثر', '#قصص_إسلامية', `#${s}`, '#اسلاميات', '#fyp', '#foryou', '#اكسبلور'],
+    twitter: ['#أثر', '#قصص_إسلامية', `#${s}`, '#قصص_القرآن'],
+    whatsapp: [],
+    telegram: ['#أثر', '#قصص_إسلامية']
+  };
+}
+
+function buildCaptions(d, h, s) {
+  const yt = d.currentLink || s.channel || '[القناة]';
+  return {
+    instagram: `${h}\n\nالقصة كاملة على أثر 🎬\n🔗 البايو\n.\n.\n.`,
+    facebook: `${h} 🌙\n\nعلى قناة أثر.\n\n🎬 ${yt}`,
+    tiktok: `${(h.split('\n')[0] || h).substring(0,80)} 🌙\nاليوتيوب 🎬`,
+    twitter: `🧵 قصة ${d.story} كاملة\n\n${h.substring(0, 200)}\n\n👇 الحلقة:\n${yt}`,
+    whatsapp: `🌙 ${h.substring(0, 100)}\n\nالقصة كاملة على قناة أثر 🎬\n\n${yt}`,
+    telegram: `🌙 *قصة ${d.story} كاملة*\n\n${h}\n\n📺 الحلقة الكاملة: ${yt}\n\n🔔 اشترك: ${s.channel || '[القناة]'}`
+  };
+}
+
+// ===== GENERATE CONTENT =====
+function generateContent() {
+  const story = val('story-name');
+  if (!story) { alert('أدخل اسم القصة أولاً'); return; }
+  const d = {
+    story, type: val('topic-type'), epNum: val('ep-num'), hook: val('hook-line'),
+    currentLink: val('ep-current-link'), prevLink: val('ep-prev-link'), nextLink: val('ep-next-link')
+  };
+  const selected = Array.from(document.querySelectorAll('.platform.selected')).map(p => p.dataset.platform);
+  if (selected.length === 0) { alert('اختر منصة واحدة على الأقل'); return; }
+  const s = getSettings();
+  const titles = buildTitles(d);
+  const hooks = buildHooks(d);
+  const desc = buildDescription(d, hooks[0].text, s);
+  const pyramid = buildTagPyramid(d);
+  const flat = flattenPyramid(pyramid);
+  const hashtags = buildHashtags(d);
+  const captions = buildCaptions(d, hooks[0].text, s);
+
+  let html = `<div class="output-card"><h2>📦 حزمة SEO لقصة "${story}"</h2></div>`;
+
+  // YouTube
+  if (selected.includes('youtube')) {
+    html += `<div class="output-card">
+      <h2>📺 YouTube</h2>
+      <div class="output-section">
+        <h3>العناوين</h3>
+        ${titles.map(t => renderCard(t, true)).join('')}
+      </div>
+      <div class="output-section">
+        <h3>الهوكات</h3>
+        ${hooks.map(h => renderCard(h)).join('')}
+      </div>
+      <div class="output-section">
+        <h3>الوصف الكامل <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(desc)})'>📋 نسخ</button></h3>
+        <div class="content-block">${desc.replace(/</g,'&lt;')}</div>
+      </div>
+      <div class="output-section">
+        <h3>التاغات (هرم رباعي) <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(flat.join(", "))})'>📋 نسخ</button></h3>
+        ${['tier1','tier2','tier3','tier4'].map((t, i) => `<div class="tier">
+          <div class="tier-header"><span class="tier-badge">${i+1}</span> <strong style="color:#633806;">${pyramid[t].label}</strong></div>
+          <div>${pyramid[t].tags.map(tg => `<span class="hashtag">${tg}</span>`).join('')}</div>
+        </div>`).join('')}
+      </div>
+      <div class="output-section">
+        <h3>الهاشتاغات (5 max) <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(hashtags.youtube.join(" "))})'>📋 نسخ</button></h3>
+        <div>${hashtags.youtube.map(h => `<span class="hashtag">${h}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  }
+
+  // Other platforms
+  const platMeta = {
+    instagram: { name: 'Instagram', icon: '📷' },
+    facebook: { name: 'Facebook', icon: '👥' },
+    tiktok: { name: 'TikTok', icon: '🎵' },
+    twitter: { name: 'Twitter/X', icon: '𝕏' },
+    whatsapp: { name: 'WhatsApp', icon: '💬' },
+    telegram: { name: 'Telegram', icon: '✈️' }
+  };
+  ['instagram','facebook','tiktok','twitter','whatsapp','telegram'].forEach(p => {
+    if (!selected.includes(p)) return;
+    const m = platMeta[p];
+    html += `<div class="output-card">
+      <h2>${m.icon} ${m.name}</h2>
+      <div class="output-section">
+        <h3>الكابشن <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(captions[p])})'>📋 نسخ</button></h3>
+        <div class="content-block">${captions[p].replace(/</g,'&lt;')}</div>
+      </div>
+      ${hashtags[p].length > 0 ? `<div class="output-section">
+        <h3>الهاشتاغات <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(hashtags[p].join(" "))})'>📋 نسخ</button></h3>
+        <div>${hashtags[p].map(h => `<span class="hashtag">${h}</span>`).join('')}</div>
+      </div>` : ''}
+    </div>`;
+  });
+
+  getEl('output-area').innerHTML = html;
+  getEl('output-area').scrollIntoView({ behavior: 'smooth' });
+
+  // Save to history
+  saveToHistory({ name: story, date: new Date().toLocaleDateString('ar-EG'), type: d.type, data: d });
+}
+
+function renderCard(item, showLen) {
+  const lb = showLen && item.length ? `<span class="length-meter ${item.length<=65?'lm-good':item.length<=70?'lm-warn':'lm-bad'}">${item.length}/65</span>` : '';
+  const tagName = item.tag === 'classic' ? 'آمن' : item.tag === 'bold' ? 'جريء' : 'بحث';
+  return `<div class="suggestion">
+    <div class="suggestion-header">
+      <div class="suggestion-label">${item.label}<span class="tag tag-${item.tag}">${tagName}</span>${lb}</div>
+      <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(item.text)})'>📋 نسخ</button>
+    </div>
+    <div class="suggestion-text">${item.text}</div>
+  </div>`;
+}
+
+// ===== PREPARE CLAUDE MESSAGE (Option B) =====
+const TYPE_NAMES = {
+  nation: 'أمة بائدة', prophet: 'نبي', companion: 'صحابي',
+  sign: 'علامة من علامات الساعة', battle: 'غزوة', miracle: 'معجزة', general: 'عام'
+};
+const TYPE_PLAYLIST = {
+  nation: 'الأمم البائدة', prophet: 'قصص الأنبياء', companion: 'الصحابة',
+  sign: 'علامات الساعة', battle: 'الغزوات', miracle: 'المعجزات', general: 'عام'
+};
+
+function showClaudeModal(message) {
+  setVal('claude-message-text', message);
+  getEl('claude-modal').style.display = 'block';
+}
+
+function copyClaudeMessage() {
+  const t = val('claude-message-text');
+  navigator.clipboard.writeText(t).then(() => showSaved());
+}
+
+function prepareEnhanceScriptMessage() {
+  const story = val('story-name');
+  const type = val('topic-type');
+  const script = val('script-text');
+  if (!script || script.length < 50) { alert('الصق نص الحلقة أولاً (50 حرف على الأقل)'); return; }
+
+  let msg = `طبّق سكِل islamic-stories-producer وحسّن نص حلقة قناة "أثر" التالي.\n\n`;
+  if (story) msg += `📌 القصة: ${story}\n`;
+  if (type) msg += `📌 النوع: ${TYPE_NAMES[type] || 'عام'}\n`;
+  msg += `\n📄 النص الخام الحالي:\n"""\n${script.substring(0, 5000)}${script.length > 5000 ? '\n...(مقتطف)' : ''}\n"""\n\n`;
+
+  msg += `🎯 المطلوب: أعد صياغة النص بالكامل بحيث:\n\n`;
+  msg += `1. **أسلوب الهكواتي السينمائي لأثر**: عامية مصرية حميمة، جُمل قصيرة (2-4 كلمات للسطر)، بناء تشويق قبل كشف الأسماء، همسات عند الذروة، افتتاحيات بـ "تخيّل...".\n`;
+  msg += `2. **التوثيق بالمراجع الصحيحة**: تحقّق من كل آية/حديث/حوار قبل كتابته — الآيات من القرآن بالرسم العثماني ﴿ ﴾، الأحاديث من البخاري ومسلم وأبي داود والترمذي مع ذكر المصدر والدرجة، والقصص من ابن كثير والطبري والقرطبي. لا تكتب أي نص ديني من الذاكرة.\n`;
+  msg += `3. **العربية الفصحى المبسّطة** للسرد العام، والعربية الكلاسيكية الأصلية للآيات والأحاديث والحوارات التاريخية الموثقة.\n`;
+  msg += `4. **بدون حشو**: كل دقيقة تستحق مكانها، لا تعليقات تفسيرية داخل السرد، التفاصيل تُحفظ للحظات الذروة.\n`;
+  msg += `5. **حدّد المصادر** التي استندت إليها في نهاية النص (آيات + أحاديث + كتب التفسير والتاريخ).\n\n`;
+  msg += `⚠️ مهم: الدقة قبل السرعة، المصدر قبل الذاكرة، التشكيل المتحقَّق قبل التخمين. إذا لم تكن متأكداً من آية أو حديث، تحقّق منه أو لا تضِفه.`;
+
+  showClaudeModal(msg);
+}
+
+function prepareClaudeMessage() {
+  const story = val('story-name');
+  if (!story) { alert('أدخل اسم القصة أولاً'); return; }
+  const type = val('topic-type');
+  const epNum = val('ep-num');
+  const hook = val('hook-line');
+  const script = val('script-text');
+  const s = getSettings();
+
+  const epLabel = epNum === 'single' ? 'حلقة منفردة' : `الحلقة رقم ${epNum} من سلسلة`;
+  const chaptersText = chapters.length > 0 ? chapters.map(c => `${c.time} ${c.title}`).join('\n') : '';
+
+  let msg = `طبّق سكِل athar-seo-optimizer واكتبلي حزمة SEO كاملة لقناة "أثر" عن قصة "${story}".\n\n`;
+  msg += `📋 بيانات الحلقة:\n`;
+  msg += `• القصة: ${story}\n`;
+  msg += `• النوع: ${TYPE_NAMES[type] || 'عام'}\n`;
+  msg += `• ${epLabel}\n`;
+  if (hook) msg += `• الهوك الافتتاحي: ${hook}\n`;
+  msg += `\n`;
+
+  if (script && script.length > 50) {
+    msg += `📄 نص الحلقة:\n"""\n${script.substring(0, 4000)}${script.length > 4000 ? '\n...(مقتطف)' : ''}\n"""\n\n`;
+  }
+
+  msg += `🎯 المطلوب (مخصص للقصة فعلياً - بدون صياغات عامة لا تنطبق):\n\n`;
+  msg += `1. **3 عناوين ACH** مخصصة لأحداث القصة الحقيقية (50-65 حرف، تنتهي بـ "| أثر"، فيها "!!"). مهم: العنوان يعكس القصة نفسها — مثلاً لقوم لوط "الفاحشة" ولأصحاب السبت "المسخ إلى قردة" — وليس صياغة عامة.\n`;
+  msg += `2. **3 هوكات** بأسلوب الهكواتي المصري (تبدأ بـ "تخيّل...").\n`;
+  msg += `3. **وصف YouTube كامل** فيه: الهوك، نبذة، الفصول الزمنية، CTA، قوائم التشغيل، روابط المنصات، المصادر من علماء أهل السنة، تنبيه AI، وحقوق النشر © قناة أثر.\n`;
+  if (chaptersText) {
+    msg += `   استخدم هذه الفصول الزمنية:\n${chaptersText}\n`;
+  } else {
+    msg += `   واستخرج فصولاً زمنية دقيقة من نص الحلقة بعناوين تعكس أحداث كل فصل.\n`;
+  }
+  msg += `4. **تاغات** بنظام الهرم الرباعي (15 تاغ).\n`;
+  msg += `5. **هاشتاغات** لكل منصة (YouTube 5، Instagram 15، TikTok، Facebook).\n`;
+  msg += `6. **نص Pinned Comment** + **سؤال تفاعلي** + **نصوص Thumbnail**.\n`;
+  msg += `7. **منشورات Community** (تشويق قبل/بعد النشر).\n\n`;
+
+  msg += `📌 ملاحظات مهمة:\n`;
+  msg += `• قائمة التشغيل المناسبة: ${TYPE_PLAYLIST[type] || 'عام'}\n`;
+  if (s.channel) msg += `• رابط القناة: ${s.channel}\n`;
+  msg += `• التزم بأسلوب أثر: مصادر موثقة من البخاري ومسلم وابن كثير والطبري، وأسلوب درامي سينمائي.\n`;
+
+  showClaudeModal(msg);
+}
+
+function prepareClaudeAnalyzeMessage() {
+  const story = val('ana-story');
+  const title = val('ana-title');
+  if (!story || !title) { alert('أدخل القصة + العنوان أولاً'); return; }
+  const type = val('ana-type');
+  const desc = val('ana-description');
+  const tags = val('ana-tags');
+  const hashtags = val('ana-hashtags');
+  const views = val('ana-views');
+  const ctr = val('ana-ctr');
+  const script = val('ana-script');
+
+  let msg = `طبّق سكِل athar-seo-optimizer وراجع وحسّن SEO هذا الفيديو من قناة "أثر".\n\n`;
+  msg += `📋 الفيديو الحالي:\n`;
+  msg += `• القصة: ${story}\n`;
+  msg += `• النوع: ${TYPE_NAMES[type] || 'عام'}\n`;
+  msg += `• العنوان الحالي: ${title}\n`;
+  if (desc) msg += `• الوصف الحالي:\n"""\n${desc.substring(0, 1500)}\n"""\n`;
+  if (tags) msg += `• التاغات الحالية: ${tags}\n`;
+  if (hashtags) msg += `• الهاشتاغات الحالية: ${hashtags}\n`;
+  if (views) msg += `• المشاهدات: ${views}\n`;
+  if (ctr) msg += `• نسبة النقر CTR: ${ctr}%\n`;
+  msg += `\n`;
+
+  if (script && script.length > 50) {
+    msg += `📄 نص الحلقة:\n"""\n${script.substring(0, 4000)}${script.length > 4000 ? '\n...(مقتطف)' : ''}\n"""\n\n`;
+  }
+
+  msg += `🎯 المطلوب:\n`;
+  msg += `1. **تحليل نقدي** للعنوان والوصف الحالي: شو المشاكل ونقاط الضعف؟\n`;
+  msg += `2. **3 عناوين بديلة محسّنة** مخصصة لأحداث القصة (لا صياغات عامة).\n`;
+  msg += `3. **وصف محسّن كامل** بمعايير ACH مع حقوق النشر © قناة أثر.\n`;
+  msg += `4. **تاغات وهاشتاغات محسّنة**.\n`;
+  msg += `5. **توصيات عملية** لرفع نسبة النقر CTR ومدة المشاهدة.\n`;
+  if (ctr) {
+    const ctrNum = parseFloat(ctr);
+    if (ctrNum < 4) msg += `\n⚠️ ملاحظة: نسبة النقر ${ctr}% منخفضة — ركّز على تحسين العنوان والصورة المصغرة.\n`;
+  }
+
+  showClaudeModal(msg);
+}
+
+function exportPackageToFile() {
+  const story = val('story-name');
+  if (!story) { alert('أدخل اسم القصة أولاً'); return; }
+  const output = getEl('output-area').innerText;
+  if (!output) { alert('ولّد الحزمة أولاً'); return; }
+  const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `أثر_${story}_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAll() {
+  if (!confirm('مسح كل البيانات؟')) return;
+  ['story-name','hook-line','ep-current-link','ep-prev-link','ep-next-link','script-text','real-duration'].forEach(id => setVal(id, ''));
+  lastScriptDuration = 0;
+  getEl('file-info').style.display = 'none';
+  getEl('quality-report').innerHTML = '';
+  getEl('output-area').innerHTML = '';
+  getEl('sensitivity-alert').innerHTML = '';
+  relatedEps = []; channelEps = []; chapters = [];
+  renderRelated(); renderChannelEps(); renderChapters();
+}
+
+// ===== HISTORY =====
+function saveToHistory(ep) {
+  try {
+    const raw = localStorage.getItem(STORAGE.episodes);
+    const list = raw ? JSON.parse(raw) : [];
+    list.push(ep);
+    localStorage.setItem(STORAGE.episodes, JSON.stringify(list.slice(-30)));
+  } catch(e) {}
+}
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(STORAGE.episodes);
+    const list = raw ? JSON.parse(raw) : [];
+    if (list.length === 0) { getEl('history-list').innerHTML = '<p class="text-muted">لا توجد حلقات محفوظة بعد.</p>'; return; }
+    getEl('history-list').innerHTML = list.slice().reverse().map(e =>
+      `<div class="ep-item">📝 <strong>${e.name}</strong><span class="text-muted">${e.date}</span></div>`
+    ).join('');
+  } catch(e) {}
+}
+
+// ===== ANALYZE VIDEO =====
+function analyzeVideo() {
+  const story = val('ana-story'); const title = val('ana-title');
+  if (!story || !title) { alert('أضف القصة + العنوان'); return; }
+  const desc = val('ana-description'); const tags = val('ana-tags'); const hash = val('ana-hashtags');
+  const sc = val('ana-script');
+  const tl = title.length;
+  const tagsL = tags.split(/[,،]/).map(t => t.trim()).filter(t => t);
+  const hashL = hash.split(/\s/).filter(h => h.startsWith('#'));
+  const issues = [], wins = [];
+  if (tl > 70) issues.push('العنوان أطول من 70 حرف'); else if (tl >= 50 && tl <= 65) wins.push(`طول مثالي (${tl})`);
+  if (!title.includes('!!')) issues.push('بدون "!!" (ACH)'); else wins.push('"!!" موجودة');
+  if (!title.includes('| أثر')) issues.push('بدون "| أثر"'); else wins.push('branding ✓');
+  if (tagsL.length < 10) issues.push(`${tagsL.length} تاغ فقط - الأمثل 10-15`);
+  else if (tagsL.length > 15) issues.push('تاغات كثيرة'); else wins.push(`${tagsL.length} تاغ ✓`);
+  if (hashL.length > 15) issues.push(`${hashL.length} هاشتاغ - YouTube سيحذف الكل!`); else if (hashL.length > 0) wins.push(`${hashL.length} هاشتاغ`);
+  if (desc.length < 200) issues.push('وصف قصير'); else if (desc.length > 500) wins.push('وصف غني');
+  if (!desc.match(/\d{1,2}[:：]\d{2}/)) issues.push('بدون فصول'); else wins.push('فصول موجودة');
+
+  let ec = [], eh = '', si = '';
+  if (sc.length > 100) {
+    const wc = sc.split(/\s+/).length, dur = wc / 105;
+    let tc; if (dur < 4) tc = 3; else if (dur < 7) tc = 4; else if (dur < 11) tc = 5; else if (dur < 16) tc = 7; else tc = 9;
+    eh = extractHook(sc).hook;
+    ec = extractChapters(sc, tc, dur);
+    si = ` (مدعوم بـ ${wc} كلمة)`;
+  }
+
+  const oldCh = chapters; chapters = ec.length > 0 ? ec : chapters;
+  const nd = { story, type: val('ana-type'), epNum: 'single', hook: eh, currentLink: val('ana-link'), prevLink: '', nextLink: '' };
+  const newTitles = buildTitles(nd);
+  const newHooks = buildHooks(nd);
+  const newDesc = buildDescription(nd, newHooks[0].text, getSettings());
+  chapters = oldCh;
+
+  let html = `<div class="output-card">
+    <h2>🔬 تحليل وتحسينات${si}</h2>
+    <div class="dashboard-grid">
+      <div class="dash-card"><div class="dash-label">العنوان</div><div class="dash-value" style="color:${tl<=65?'#27500a':'#791f1f'};">${tl}</div></div>
+      <div class="dash-card"><div class="dash-label">التاغات</div><div class="dash-value">${tagsL.length}</div></div>
+      <div class="dash-card"><div class="dash-label">الهاشتاغات</div><div class="dash-value">${hashL.length}</div></div>
+      <div class="dash-card"><div class="dash-label">الوصف</div><div class="dash-value">${desc.length}</div></div>
+    </div>`;
+  if (wins.length) html += `<div style="margin:12px 0;">${wins.map(w => `<div class="alert alert-success" style="margin-bottom:4px;">✓ ${w}</div>`).join('')}</div>`;
+  if (issues.length) html += `<div style="margin:12px 0;">${issues.map(i => `<div class="alert alert-danger" style="margin-bottom:4px;">✗ ${i}</div>`).join('')}</div>`;
+  html += `<h3 style="margin-top:14px;">✨ النسخة المحسّنة</h3>
+    <div class="compare-grid">
+      <div class="compare-cell before"><strong>قبل:</strong><br>${title}</div>
+      <div class="compare-cell after"><strong>بعد:</strong><br>${newTitles[0].text}</div>
+    </div>
+    ${newTitles.map(t => renderCard(t, true)).join('')}
+    <h3 style="margin-top:14px;">3 هوكات محسّنة</h3>
+    ${newHooks.map(h => renderCard(h)).join('')}
+    <h3 style="margin-top:14px;">الوصف المحسّن <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(newDesc)})'>📋 نسخ</button></h3>
+    <div class="content-block">${newDesc.replace(/</g,'&lt;')}</div>
+    ${ec.length > 0 ? `<h3 style="margin-top:14px;">${ec.length} فصل مستخرج من النص</h3><div class="content-block">${ec.map(c => `${c.time} ${c.title}`).join('\n')}</div>` : ''}
+  </div>`;
+  getEl('analyze-output').innerHTML = html;
+}
+
+function importToCreate() {
+  const story = val('ana-story');
+  if (!story) { alert('أدخل القصة'); return; }
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-mode="create"]').classList.add('active');
+  ['analyze','thumbnail','shorts','dashboard','calendar','quality'].forEach(m => getEl(m + '-mode').classList.add('hidden'));
+  getEl('create-mode').classList.remove('hidden');
+  setVal('story-name', story);
+  setVal('topic-type', val('ana-type'));
+  setVal('ep-num', 'single');
+  if (val('ana-link')) setVal('ep-current-link', val('ana-link'));
+  if (val('ana-script')) { setVal('script-text', val('ana-script')); setTimeout(smartAnalyzeScript, 100); }
+  toggleEpisodeFields();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== THUMBNAIL ANALYZER =====
+function handleThumb(event, slot) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    thumbImages[slot] = e.target.result;
+    getEl(`thumb-${slot}-preview`).innerHTML = `<div class="thumb-preview"><img src="${e.target.result}"></div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeThumbnails() {
+  const slots = ['a','b','c'].filter(s => thumbImages[s]);
+  if (slots.length < 2) { alert('ارفع صورتين على الأقل'); return; }
+  getEl('thumbnail-output').innerHTML = '<div class="output-card"><p style="text-align:center;padding:20px;">⏳ جارٍ التحليل...</p></div>';
+  const results = [];
+  for (const slot of slots) {
+    const r = await analyzeImage(thumbImages[slot], slot);
+    results.push(r);
+  }
+  renderThumbResults(results);
+}
+
+function analyzeImage(dataUrl, slot) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = getEl('thumb-canvas');
+      canvas.width = 320; canvas.height = 180;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 320, 180);
+      const data = ctx.getImageData(0, 0, 320, 180).data;
+      let totalR = 0, totalG = 0, totalB = 0, darkPx = 0, brightPx = 0, warmPx = 0, goldenPx = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i+1], b = data[i+2];
+        totalR += r; totalG += g; totalB += b;
+        const lum = 0.299*r + 0.587*g + 0.114*b;
+        if (lum < 60) darkPx++; if (lum > 200) brightPx++;
+        if (r > g && r > b) warmPx++;
+        if (r > 150 && r < 220 && g > 100 && g < 180 && b < 100) goldenPx++;
+      }
+      const total = data.length / 4;
+      const avgR = totalR/total, avgG = totalG/total, avgB = totalB/total;
+      const avgLum = 0.299*avgR + 0.587*avgG + 0.114*avgB;
+      const contrast = (brightPx + darkPx) / total;
+      const warmth = warmPx / total;
+      const saturation = Math.abs(avgR - avgG) + Math.abs(avgG - avgB) + Math.abs(avgR - avgB);
+      const goldenMatch = goldenPx / total;
+      let edges = 0;
+      for (let y = 1; y < 179; y++) {
+        for (let x = 1; x < 319; x++) {
+          const i = (y*320 + x) * 4, iL = (y*320 + x - 1) * 4;
+          if (Math.abs(data[i] - data[iL]) > 50) edges++;
+        }
+      }
+      const edgeRatio = edges / total;
+      let score = 0;
+      const sp = {};
+      sp.contrast = Math.min(15, Math.floor(contrast * 100)); score += sp.contrast;
+      sp.brightness = avgLum > 80 && avgLum < 180 ? 12 : avgLum > 60 ? 8 : 4; score += sp.brightness;
+      sp.saturation = saturation > 50 ? 13 : saturation > 30 ? 9 : 5; score += sp.saturation;
+      sp.warmth = warmth > 0.5 ? 15 : warmth > 0.3 ? 10 : 5; score += sp.warmth;
+      sp.athar = goldenMatch > 0.05 ? 15 : goldenMatch > 0.02 ? 10 : 3; score += sp.athar;
+      sp.complexity = edgeRatio > 0.5 ? 5 : edgeRatio > 0.2 ? 15 : 10; score += sp.complexity;
+      const estCTR = (2 + (score / 100) * 8).toFixed(1);
+      resolve({ slot: slot.toUpperCase(), dataUrl, score, sp, avgLum: Math.round(avgLum), contrast: (contrast*100).toFixed(1), warmth: (warmth*100).toFixed(1), saturation: Math.round(saturation), goldenMatch: (goldenMatch*100).toFixed(1), edgeRatio: (edgeRatio*100).toFixed(1), estCTR });
+    };
+    img.src = dataUrl;
+  });
+}
+
+function renderThumbResults(results) {
+  results.sort((a, b) => b.score - a.score);
+  const winner = results[0];
+  let html = `<div class="output-card">
+    <h2>🏆 الفائز: الصورة ${winner.slot}</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;">`;
+  results.forEach((r, i) => {
+    html += `<div class="thumb-preview"><img src="${r.dataUrl}"><div class="thumb-score">${r.score}/100</div>${i===0?`<div class="thumb-winner">🏆 الفائز</div>`:''}</div>`;
+  });
+  html += `</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">`;
+  results.forEach(r => {
+    const recs = [];
+    if (r.sp.contrast < 10) recs.push('زد التباين');
+    if (r.sp.warmth < 10) recs.push('ألوان أدفأ');
+    if (r.sp.athar < 10) recs.push('أضف ذهبي/بني (هوية أثر)');
+    if (r.sp.complexity < 8) recs.push('قلل التعقيد');
+    if (r.sp.saturation < 10) recs.push('زد التشبع');
+    html += `<div class="suggestion">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <strong>الصورة ${r.slot}</strong>
+        <span style="font-size:18px;font-weight:700;color:${r.score>=70?'#27500a':r.score>=50?'#BA7517':'#a32d2d'};">${r.score}/100</span>
+      </div>
+      <div style="font-size:12px;color:#666;margin-bottom:6px;">CTR متوقع: <strong>${r.estCTR}%</strong></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;margin-bottom:8px;">
+        <div>التباين: ${r.contrast}%</div><div>السطوع: ${r.avgLum}</div>
+        <div>الدفء: ${r.warmth}%</div><div>التشبع: ${r.saturation}</div>
+        <div>هوية أثر: ${r.goldenMatch}%</div><div>التعقيد: ${r.edgeRatio}%</div>
+      </div>
+      ${recs.length > 0 ? `<div style="font-size:11px;color:#791f1f;"><strong>💡 توصيات:</strong><ul style="margin:4px 0 0;padding-right:16px;">${recs.map(r => `<li>${r}</li>`).join('')}</ul></div>` : '<div style="font-size:11px;color:#27500a;">✓ صورة قوية</div>'}
+    </div>`;
+  });
+  html += `</div><div class="alert alert-success" style="margin-top:16px;"><strong>📊 التوصية:</strong> استخدم الصورة <strong>${winner.slot}</strong> (${winner.score}/100). CTR متوقع: ${winner.estCTR}%</div></div>`;
+  getEl('thumbnail-output').innerHTML = html;
+}
+
+// ===== SHORTS GENERATOR =====
+function generateShorts() {
+  const story = val('shorts-story'); const text = val('shorts-script');
+  if (!story || !text) { alert('أضف القصة + نص الحلقة'); return; }
+  const hook = extractHook(text).hook || text.substring(0, 200);
+  const climaxWords = ['فجأة','صعق','صرخ','فلما','حتى إذا','وأخيراً','الموت','العذاب','الصيحة','الريح'];
+  let climax = '';
+  for (const w of climaxWords) {
+    const idx = text.indexOf(w, text.length * 0.3);
+    if (idx !== -1 && idx < text.length * 0.7) {
+      climax = text.substring(idx, Math.min(idx + 300, text.length)).split(/[\.!\?]/)[0];
+      break;
+    }
+  }
+  if (!climax) climax = text.substring(Math.floor(text.length * 0.5), Math.floor(text.length * 0.5) + 250);
+  const cliffhanger = text.substring(Math.floor(text.length * 0.85)).split(/[\.!\?]/)[0] || text.substring(text.length - 250);
+
+  const shorts = [
+    { type: 'Teaser', emoji: '🎬', desc: 'قبل نشر الحلقة - يولّد فضول', length: '15-30 ثانية', text: `${hook.substring(0, 150)}...\n\n📺 الحلقة الكاملة هذا الخميس!\n\nقصة ${story} كاملة 🌙\n\n#أثر #قصص_إسلامية #${story.replace(/\s+/g,'_')}` },
+    { type: 'Hook Moment', emoji: '⚡', desc: 'بعد 12 ساعة من نشر الحلقة - أقوى لحظة', length: '30-45 ثانية', text: `لحظة لن تنساها من قصة ${story}!\n\n${climax.substring(0, 250)}...\n\n📺 شاهد القصة كاملة على قناة أثر\n\n#أثر #قصص_إسلامية #${story.replace(/\s+/g,'_')} #Shorts` },
+    { type: 'Cliffhanger', emoji: '🔥', desc: 'بعد 48 ساعة - يدفع للحلقة الكاملة', length: '30 ثانية', text: `هل تعلم كيف انتهت قصة ${story}؟\n\n${cliffhanger.substring(0, 200)}...\n\nالقصة كاملة على قناة أثر 📺\n\n#أثر #قصص_إسلامية #${story.replace(/\s+/g,'_')} #Shorts` }
+  ];
+
+  let html = `<div class="output-card"><h2>✂️ 3 سكربتات Shorts من حلقة "${story}"</h2>`;
+  shorts.forEach(s => {
+    html += `<div class="suggestion">
+      <div class="suggestion-header">
+        <strong>${s.emoji} ${s.type} (${s.length})</strong>
+        <button class="btn-icon btn-small" onclick='copyText(${JSON.stringify(s.text)})'>📋 نسخ</button>
+      </div>
+      <p style="font-size:11px;color:#888;margin-bottom:8px;">${s.desc}</p>
+      <div class="content-block">${s.text}</div>
+    </div>`;
+  });
+  html += `<div class="alert alert-info" style="margin-top:12px;"><strong>💡 توقيت النشر المثالي:</strong> Teaser قبل الحلقة، Hook Moment بعد 12ساعة، Cliffhanger بعد 48 ساعة</div></div>`;
+  getEl('shorts-output').innerHTML = html;
+}
+
+// ===== QUALITY CHECKER =====
+function runQualityCheck() {
+  const title = val('qual-title'); const desc = val('qual-desc');
+  const tags = val('qual-tags'); const hash = val('qual-hashtags');
+  if (!title) { alert('أدخل العنوان'); return; }
+  const checks = [];
+  checks.push({ ok: title.length >= 50 && title.length <= 65, m: `طول العنوان (${title.length}) - الأمثل 50-65` });
+  checks.push({ ok: title.includes('!!'), m: 'يحتوي "!!" (ACH)' });
+  checks.push({ ok: title.includes('| أثر'), m: 'ينتهي بـ "| أثر"' });
+  checks.push({ ok: desc.length >= 500, m: `الوصف ≥ 500 (${desc.length})` });
+  checks.push({ ok: desc.match(/\d{1,2}[:：]\d{2}/) !== null, m: 'فصول زمنية في الوصف' });
+  checks.push({ ok: desc.includes('━━━'), m: 'فواصل بصرية' });
+  checks.push({ ok: desc.includes('🔔') || desc.includes('اشترك'), m: 'CTA اشتراك' });
+  checks.push({ ok: desc.includes('قائمة') || desc.includes('playlist'), m: 'روابط قوائم تشغيل' });
+  checks.push({ ok: desc.includes('Instagram') || desc.includes('Facebook'), m: 'روابط منصات أخرى' });
+  checks.push({ ok: desc.includes('البخاري') || desc.includes('ابن كثير') || desc.includes('مسلم'), m: 'مصادر موثقة' });
+  checks.push({ ok: desc.includes('تنبيه') || desc.includes('الذكاء الاصطناعي'), m: 'تنبيه AI' });
+  const tagsL = tags.split(/[,،]/).filter(t => t.trim());
+  checks.push({ ok: tagsL.length >= 10 && tagsL.length <= 15, m: `التاغات (${tagsL.length}) في الأمثل 10-15` });
+  const hashL = hash.split(/\s/).filter(h => h.startsWith('#'));
+  checks.push({ ok: hashL.length <= 5 && hashL.length > 0, m: `الهاشتاغات (${hashL.length}) ≤ 5` });
+  checks.push({ ok: !desc.match(/\[[^\]]+\]/), m: 'لا توجد placeholders' });
+  checks.push({ ok: desc.length > 0, m: 'الوصف غير فارغ' });
+
+  const passed = checks.filter(c => c.ok).length;
+  const total = checks.length;
+  const pct = Math.round((passed / total) * 100);
+  const color = pct >= 80 ? '#27500a' : pct >= 60 ? '#BA7517' : '#a32d2d';
+  const grade = pct >= 80 ? '✅ جاهز للنشر' : pct >= 60 ? '⚠️ يحتاج تحسين' : '❌ مشاكل كثيرة';
+
+  let html = `<div class="output-card">
+    <h2>🛡️ نتيجة الفحص</h2>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:48px;font-weight:700;color:${color};">${passed}/${total}</div>
+      <div style="font-size:14px;color:#666;">${pct}% - ${grade}</div>
+    </div>
+    ${checks.map(c => `<div class="alert ${c.ok?'alert-success':'alert-danger'}" style="margin-bottom:4px;">${c.ok?'✓':'✗'} ${c.m}</div>`).join('')}
+  </div>`;
+  getEl('quality-output').innerHTML = html;
+}
+
+// ===== DASHBOARD =====
+function addDashEp() {
+  const name = val('dash-name');
+  if (!name) return;
+  const ep = {
+    name,
+    views: parseInt(val('dash-views')) || 0,
+    ctr: parseFloat(val('dash-ctr')) || 0,
+    watch: parseFloat(val('dash-watch')) || 0,
+    date: val('dash-date') || new Date().toISOString().split('T')[0]
+  };
+  dashEps.push(ep);
+  try { localStorage.setItem(STORAGE.dashboard, JSON.stringify(dashEps)); } catch(e) {}
+  ['dash-name','dash-views','dash-ctr','dash-watch'].forEach(id => setVal(id, ''));
+  renderDashboard();
+}
+
+function loadDashboard() {
+  try { const raw = localStorage.getItem(STORAGE.dashboard); if (raw) dashEps = JSON.parse(raw); } catch(e) {}
+  renderDashboard();
+}
+
+function removeDashEp(i) { dashEps.splice(i, 1); localStorage.setItem(STORAGE.dashboard, JSON.stringify(dashEps)); renderDashboard(); }
+
+function renderDashboard() {
+  const el = getEl('dashboard-content');
+  if (dashEps.length === 0) {
+    el.innerHTML = '<div class="alert alert-info">لا توجد بيانات. أضف حلقاتك السابقة أعلاه.</div>';
+    return;
+  }
+  const totalV = dashEps.reduce((s, e) => s + e.views, 0);
+  const avgCTR = (dashEps.reduce((s, e) => s + e.ctr, 0) / dashEps.length).toFixed(2);
+  const avgWatch = (dashEps.reduce((s, e) => s + e.watch, 0) / dashEps.length).toFixed(1);
+  const bestCTR = [...dashEps].sort((a,b) => b.ctr - a.ctr)[0];
+  const bestViews = [...dashEps].sort((a,b) => b.views - a.views)[0];
+  const estRevLow = (totalV / 1000 * 0.5).toFixed(0);
+  const estRevHigh = (totalV / 1000 * 2).toFixed(0);
+
+  let html = `<div class="dashboard-grid">
+    <div class="dash-card"><div class="dash-label">إجمالي المشاهدات</div><div class="dash-value">${totalV.toLocaleString()}</div></div>
+    <div class="dash-card"><div class="dash-label">متوسط CTR</div><div class="dash-value">${avgCTR}%</div></div>
+    <div class="dash-card"><div class="dash-label">متوسط Watch</div><div class="dash-value">${avgWatch}%</div></div>
+    <div class="dash-card"><div class="dash-label">عدد الحلقات</div><div class="dash-value">${dashEps.length}</div></div>
+    <div class="dash-card"><div class="dash-label">💰 Revenue تقديري</div><div class="dash-value" style="font-size:16px;">$${estRevLow} - $${estRevHigh}</div></div>
+  </div>
+  <div class="alert alert-success"><strong>🏆 أعلى CTR:</strong> ${bestCTR.name} - ${bestCTR.ctr}%</div>
+  <div class="alert alert-info"><strong>📈 أعلى مشاهدات:</strong> ${bestViews.name} - ${bestViews.views.toLocaleString()}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;">
+    <thead><tr style="background:#f9f5eb;">
+      <th style="padding:8px;text-align:right;">الحلقة</th>
+      <th style="padding:8px;">مشاهدات</th>
+      <th style="padding:8px;">CTR</th>
+      <th style="padding:8px;">Watch</th>
+      <th style="padding:8px;">التاريخ</th>
+      <th style="padding:8px;"></th>
+    </tr></thead>
+    <tbody>${dashEps.map((e, i) => `<tr style="border-bottom:1px solid #f0ebe0;">
+      <td style="padding:8px;">${e.name}</td>
+      <td style="padding:8px;text-align:center;">${e.views.toLocaleString()}</td>
+      <td style="padding:8px;text-align:center;">${e.ctr}%</td>
+      <td style="padding:8px;text-align:center;">${e.watch}%</td>
+      <td style="padding:8px;text-align:center;font-size:11px;">${e.date}</td>
+      <td style="padding:8px;text-align:center;"><button class="btn-danger btn-small" onclick="removeDashEp(${i})">✕</button></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+  el.innerHTML = html;
+}
+
+// ===== INIT =====
+document.addEventListener('input', e => {
+  if (e.target.id === 'story-name') checkSensitivity();
+});
+
+loadSettings();
+loadDashboard();
+toggleEpisodeFields();
+renderChapters();
+filterRefs(document.querySelector('[data-refcat="all"]'));
+filterHooks(document.querySelector('[data-hookcat="all"]'));
+</script>
+
+</body>
+</html>
